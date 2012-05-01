@@ -1,0 +1,15 @@
+*.dmp
+*.tmp
+*.in
+*.out
+*.clo
+*.aei
+*.gnu
+element6
+mercury6
+close6
+results
+png
+*.dmp *.clo *.out *.tmp *.aei
+result
+smth*

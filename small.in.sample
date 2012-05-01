@@ -1,0 +1,7 @@
+)O+_06 Small-body initial data  (WARNING: Do not delete this line!!)
+) Lines beginning with `)' are ignored.
+)---------------------------------------------------------------------
+ style (Cartesian, Asteroidal, Cometary) = Ast
+)---------------------------------------------------------------------
+ APOLLO   ep=2450400.5
+ 1.4710345 .5600245  6.35621 285.63908  35.92313  15.77656 0 0 0
