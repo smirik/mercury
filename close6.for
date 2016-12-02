@@ -575,7 +575,7 @@ c
       piby2 = .5d0 * pi
 c
 c Reduce mean anomaly to lie in the range 0 < l < pi
-      if (oldl.ge.0) then
+      if (oldl.ge.0d0) then
         l = mod(oldl, twopi)
       else
         l = mod(oldl, twopi) + twopi
@@ -612,8 +612,8 @@ c Improved value using Halley's method
           x = u1
         end if
         x2 = x*x
-        sn = x*(1.d0 + x2*(-.16605 + x2*.00761) )
-        dsn = 1.d0 + x2*(-.49815 + x2*.03805)
+        sn = x*(1.d0 + x2*(-.16605d0 + x2*.00761d0) )
+        dsn = 1.d0 + x2*(-.49815d0 + x2*.03805d0)
         if (flag) dsn = -dsn
         f2 = e*sn
         f0 = u1 - f2 - l
@@ -629,7 +629,7 @@ c Rough starting value for eccentric anomaly
         p = ome / z1
         q = .5d0 * l / z1
         p2 = p*p
-        z2 = exp( log( dsqrt( p2*p + q*q ) + q )/1.5 )
+        z2 = exp( log( dsqrt( p2*p + q*q ) + q )/1.5d0 )
         u1 = 2.d0*q / ( z2 + p + p2/z2 )
 c
 c Improved value using Newton's method
@@ -660,12 +660,13 @@ c
       x2 = x*x
       ss = 1.d0
       cc = 1.d0
-c
-      ss = x*x2/6.*(1. - x2/20.*(1. - x2/42.*(1. - x2/72.*(1. -
-     %   x2/110.*(1. - x2/156.*(1. - x2/210.*(1. - x2/272.)))))))
-      cc =   x2/2.*(1. - x2/12.*(1. - x2/30.*(1. - x2/56.*(1. -
-     %   x2/ 90.*(1. - x2/132.*(1. - x2/182.*(1. - x2/240.*(1. -
-     %   x2/306.))))))))
+c----------------------------------------------------------------
+      ss = x*x2/6.d0*(1.d0 - x2/20.d0*(1.d0 - x2/42.d0*(1.d0 -
+     % x2/72.d0*(1.d0 - x2/110.d0*(1.d0 - x2/156.d0*(1.d0 - 
+     % x2/210.d0*(1.d0 - x2/272.d0)))))))
+      cc =   x2/2.d0*(1.d0 - x2/12.d0*(1.d0 - x2/30.d0*(1.d0 -
+     % x2/56.d0*(1.d0 - x2/ 90.d0*(1.d0 - x2/132.d0*(1.d0 -
+     % x2/182.d0*(1.d0 - x2/240.d0*(1.d0 - x2/306.d0))))))))
 c
       if (big) then
         z1 = cc + z3 - 1.d0
@@ -720,7 +721,7 @@ c
       pi = 3.141592653589793d0
       twopi = 2.d0 * pi
 c
-      if (x.gt.0) then
+      if (x.gt.0d0) then
         x = mod(x,twopi)
       else
         x = mod(x,twopi) + twopi
@@ -1251,19 +1252,19 @@ c
 c
 c Inclination and node
       ci = hz / h
-      if (abs(ci).lt.1) then
+      if (abs(ci).lt.1d0) then
         i = acos (ci)
         n = atan2 (hx,-hy)
-        if (n.lt.0) n = n + TWOPI
+        if (n.lt.0d0) n = n + TWOPI
       else
-        if (ci.gt.0) i = 0.d0
-        if (ci.lt.0) i = PI
+        if (ci.gt.0d0) i = 0.d0
+        if (ci.lt.0d0) i = PI
         n = 0.d0
       end if
 c
 c Eccentricity and perihelion distance
       temp = 1.d0  +  s * (v2 / gm  -  2.d0 / r)
-      if (temp.le.0) then
+      if (temp.le.0d0) then
         e = 0.d0
       else
         e = sqrt (temp)
@@ -1279,7 +1280,7 @@ c True longitude
       else
         true = atan2(y * ci, x)
       end if
-      if (ci.lt.0) true = true + PI
+      if (ci.lt.0d0) true = true + PI
 c
       if (e.lt.3.d-8) then
         p = 0.d0
@@ -1288,31 +1289,31 @@ c
         ce = (v2*r - gm) / (e*gm)
 c
 c Mean anomaly for ellipse
-        if (e.lt.1) then
-          if (abs(ce).gt.1) ce = sign(1.d0,ce)
+        if (e.lt.1d0) then
+          if (abs(ce).gt.1d0) ce = sign(1.d0,ce)
           bige = acos(ce)
-          if (rv.lt.0) bige = TWOPI - bige
+          if (rv.lt.0d0) bige = TWOPI - bige
           l = bige - e*sin(bige)
         else
 c
 c Mean anomaly for hyperbola
-          if (ce.lt.1) ce = 1.d0
+          if (ce.lt.1d0) ce = 1.d0
           bige = log( ce + sqrt(ce*ce-1.d0) )
-          if (rv.lt.0) bige = - bige
+          if (rv.lt.0d0) bige = - bige
           l = e*sinh(bige) - bige
         end if
 c
 c Longitude of perihelion
         cf = (s - r) / (e*r)
-        if (abs(cf).gt.1) cf = sign(1.d0,cf)
+        if (abs(cf).gt.1d0) cf = sign(1.d0,cf)
         f = acos(cf)
-        if (rv.lt.0) f = TWOPI - f
+        if (rv.lt.0d0) f = TWOPI - f
         p = true - f
         p = mod (p + TWOPI + TWOPI, TWOPI)
       end if
 c
-      if (l.lt.0.and.e.lt.1) l = l + TWOPI
-      if (l.gt.TWOPI.and.e.lt.1) l = mod (l, TWOPI)
+      if (l.lt.0d0.and.e.lt.1d0) l = l + TWOPI
+      if (l.gt.TWOPI.and.e.lt.1d0) l = mod (l, TWOPI)
 c
 c------------------------------------------------------------------------------
 c
@@ -1357,14 +1358,14 @@ c Local
 c
 c------------------------------------------------------------------------------
 c
-      if (jd0.le.0) goto 50
+      if (jd0.le.0d0) goto 50
 c
       jd = jd0 + 0.5d0
       i = sign( dint(dabs(jd)), jd )
       f = jd - 1.d0*i
 c
 c If on or after 15th October 1582
-      if (i.gt.2299160) then
+      if (i.gt.2299160d0) then
         temp = (1.d0*i-1867216.25d0) / 36524.25d0
         a = sign( dint(dabs(temp)), temp )
         temp = .25d0 * a
@@ -1390,8 +1391,8 @@ c
       if (month.gt.2) year = d - 4716
       if (month.le.2) year = d - 4715
 c
-      if (day.gt.32) then
-        day = day - 32
+      if (day.gt.32d0) then
+        day = day - 32d0
         month = month + 1
       end if
 c
@@ -1404,9 +1405,9 @@ c
   50  continue
 c
 c Algorithm for negative Julian day numbers (Duffett-Smith won't work)
-      x = jd0 - 2232101.5
+      x = jd0 - 2232101.5d0
       f = x - dint(x)
-      if (f.lt.0) f = f + 1.d0
+      if (f.lt.0d0) f = f + 1.d0
       y = dint(mod(x,1461.d0) + 1461.d0)
       z = dint(mod(y,365.25d0))
       month = int((z + 0.5d0) / 30.61d0)
@@ -1414,7 +1415,7 @@ c Algorithm for negative Julian day numbers (Duffett-Smith won't work)
       month = mod(month + 2, 12) + 1
 c
       year = 1399 + int (x / 365.25d0)
-      if (x.lt.0) year = year - 1
+      if (x.lt.0d0) year = year - 1
       if (month.lt.3) year = year + 1
 c
 c------------------------------------------------------------------------------
@@ -1670,9 +1671,9 @@ c  Begin with a reasonable guess based on solving the cubic for small F
 
 	a = 6.d0*(e-1.d0)/e
 	b = -6.d0*capn/e
-	sq = sqrt(0.25*b*b +a*a*a/27.d0)
-	biga = (-0.5*b + sq)**0.3333333333333333d0
-	bigb = -(+0.5*b + sq)**0.3333333333333333d0
+	sq = sqrt(0.25d0*b*b +a*a*a/27.d0)
+	biga = (-0.5d0*b + sq)**0.3333333333333333d0
+	bigb = -(+0.5d0*b + sq)**0.3333333333333333d0
 	x = biga + bigb
 c	write(6,*) 'cubic = ',x**3 +a*x +b
 	orbel_flon = x
@@ -1758,7 +1759,7 @@ c...  Executable code
 	if (q.lt.1.d-3) then
 	   orbel_zget = q*(1.d0 - (q*q/3.d0)*(1.d0 -q*q))
 	else
-	   x = 0.5d0*(3.d0*q + sqrt(9.d0*(q**2) +4.d0))
+	   x = 0.5d0*(3.d0*q + sqrt(9.d0*(q**2d0) +4.d0))
 	   tmp = x**(1.d0/3.d0)
 	   orbel_zget = tmp - 1.d0/tmp
 	endif
