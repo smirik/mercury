@@ -15,6 +15,16 @@ and answer "yes" for the question about creating sample files.
 
 **Original message by John E. Chambers**
 
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+THIS VERSION OF MERCURY6 PACKAGE WAS MODIFIED BY I. DOVGALEV
+TO PROVIDE TRUE DOUBLE PRECISION CALCULATIONS. ALSO, THE INITIAL DATA
+FOR PLANETS IN "big.in" FILE WAS UPDATED (see http://ssd.jpl.nasa.gov).
+FOR ANY QUESTIONS ABOUT THIS MODIFICATION PLEASE CONTACT WITH ME USING
+THIS E-MAIL:
+idovgalyov@4xxi.com                                         2016-12-05
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
 
                M A N U A L   F O R   T H E   M E R C U R Y   I N T E G R A T O R
                =================================================================
