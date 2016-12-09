@@ -37,7 +37,7 @@ c  S      = spin angular momentum (solar masses AU^2/day)
 c  RHO    = physical density (g/cm^3)
 c  RCEH   = close-encounter limit (Hill radii)
 c  STAT   = status (0 => alive, <>0 => to be removed)
-c  ID     = name of the object (8 characters)
+c  ID     = name of the object (25 characters)
 c  CE     = close encounter status
 c  NGF    = (1-3) cometary non-gravitational (jet) force parameters
 c   "     =  (4)  beta parameter for radiation pressure and P-R drag
@@ -117,7 +117,7 @@ c
       real*8 m(NMAX),xh(3,NMAX),vh(3,NMAX),s(3,NMAX),rho(NMAX)
       real*8 rceh(NMAX),epoch(NMAX),ngf(4,NMAX),rmax,rcen,jcen(3)
       real*8 cefac,time,tstart,tstop,dtout,h0,tol,en(3),am(3)
-      character*8 id(NMAX)
+      character*25 id(NMAX)
       character*80 outfile(3), dumpfile(4), mem(NMESS)
       external mdt_mvs, mdt_bs1, mdt_bs2, mdt_ra15, mdt_hy
       external mco_dh2h,mco_h2dh
@@ -280,7 +280,7 @@ c Input/Output
       real*8 time,tstart,tstop,dtout,h0,tol,jcen(3),rcen,rmax
       real*8 en(3),am(3),cefac,m(nbod),xh(3,nbod),vh(3,nbod)
       real*8 s(3,nbod),rho(nbod),rceh(nbod),ngf(4,nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
       character*80 outfile(3),dumpfile(4),mem(NMESS)
 c
 c Local
@@ -534,7 +534,7 @@ c Input/Output
       real*8 time,tstart,tstop,dtout,h0,tol,jcen(3),rcen,rmax
       real*8 en(3),am(3),cefac,m(nbod),xh(3,nbod),vh(3,nbod)
       real*8 s(3,nbod),rho(nbod),rceh(nbod),ngf(4,nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
       character*80 outfile(3),dumpfile(4),mem(NMESS)
 c
 c Local
@@ -995,7 +995,7 @@ c Input/Output
       real*8 time,tstart,elost,jcen(3)
       real*8 m(nbod),xh(3,nbod),vh(3,nbod),s(3,nbod),rphys(nbod)
       character*80 outfile,mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer year,month,itmp
@@ -1021,10 +1021,10 @@ c
       if (opt(3).eq.1) then
         call mio_jd2y (time,year,month,t1)
         if (i.eq.0) then
-          flost = '(1x,a8,a,i10,1x,i2,1x,f8.5)'
+          flost = '(1x,a25,a,i10,1x,i2,1x,f8.5)'
           write (23,flost) id(j),mem(67)(1:lmem(67)),year,month,t1
         else
-          fcol  = '(1x,a8,a,a8,a,i10,1x,i2,1x,f4.1)'
+          fcol  = '(1x,a25,a,a25,a,i10,1x,i2,1x,f4.1)'
           write (23,fcol) id(i),mem(69)(1:lmem(69)),id(j),
      %      mem(71)(1:lmem(71)),year,month,t1
         end if
@@ -1032,14 +1032,14 @@ c
         if (opt(3).eq.3) then
           t1 = (time - tstart) / 365.25d0
           tstring = mem(2)
-          flost = '(1x,a8,a,f18.7,a)'
-          fcol  = '(1x,a8,a,a8,a,1x,f14.3,a)'
+          flost = '(1x,a25,a,f18.7,a)'
+          fcol  = '(1x,a25,a,a25,a,1x,f14.3,a)'
         else
           if (opt(3).eq.0) t1 = time
           if (opt(3).eq.2) t1 = time - tstart
           tstring = mem(1)
-          flost = '(1x,a8,a,f18.5,a)'
-          fcol  = '(1x,a8,a,a8,a,1x,f14.1,a)'
+          flost = '(1x,a25,a,f18.5,a)'
+          fcol  = '(1x,a25,a,a25,a,1x,f14.1,a)'
         end if
         if (i.eq.0.or.i.eq.1) then
           write (23,flost) id(j),mem(67)(1:lmem(67)),t1,tstring
@@ -1149,7 +1149,7 @@ c Input/Output
       real*8 tstart,h,jcen(3),rcen,rmax,cefac,m(nbod),x(3,nbod)
       real*8 v(3,nbod),s(3,nbod),rho(nbod),rceh(nbod),rphys(nbod)
       real*8 rce(nbod),rcrit(nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
       character*80 outfile
 c
 c Local
@@ -1198,12 +1198,12 @@ c Write list of object's identities to close-encounter output file
 c
       do j = 2, nbod
         c(j)(1:8) = mio_re2c (dble(j - 1), 0.d0, 11239423.99d0)
-        c(j)(4:11) = id(j)
-        c(j)(12:19) = mio_fl2c (m(j) * k_2)
-        c(j)(20:27) = mio_fl2c (s(1,j) * k_2)
-        c(j)(28:35) = mio_fl2c (s(2,j) * k_2)
-        c(j)(36:43) = mio_fl2c (s(3,j) * k_2)
-        c(j)(44:51) = mio_fl2c (rho(j) / rhocgs)
+        c(j)(4:28) = id(j)
+        c(j)(29:36) = mio_fl2c (m(j) * k_2)
+        c(j)(37:44) = mio_fl2c (s(1,j) * k_2)
+        c(j)(45:52) = mio_fl2c (s(2,j) * k_2)
+        c(j)(53:60) = mio_fl2c (s(3,j) * k_2)
+        c(j)(61:68) = mio_fl2c (rho(j) / rhocgs)
       end do
 c
 c Write compressed output to file
@@ -1211,7 +1211,7 @@ c Write compressed output to file
       write (22,'(a1,a2,i2,a62,i1)') char(12),'6a',algor,header(1:62),
      %  opt(4)
       do j = 2, nbod
-        write (22,'(a51)') c(j)(1:51)
+        write (22,'(a68)') c(j)(1:68)
       end do
       close (22)
 c
@@ -3403,7 +3403,7 @@ c Input/Output
       real*8 rce(nbod),rcrit(nbod),ngf(4,nbod),tclo(CMAX),dclo(CMAX)
       real*8 ixvclo(6,CMAX),jxvclo(6,CMAX)
       character*80 outfile(3),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer j,nce,ice(NMAX),jce(NMAX),ce(NMAX),iflag
@@ -3560,7 +3560,7 @@ c Input/Output
       real*8 rce(nbod),rphy(nbod),rcrit(nbod),ngf(4,nbod)
       real*8 tclo(CMAX),dclo(CMAX),ixvclo(6,CMAX),jxvclo(6,CMAX)
       character*80 outfile(3),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
       external force
 c
 c Local
@@ -3572,7 +3572,7 @@ c Local
       real*8 rcritbs(NMAX),rcebs(NMAX),rphybs(NMAX)
       real*8 ngfbs(4,NMAX),x0(3,NMAX),v0(3,NMAX)
       real*8 thit(CMAX),dhit(CMAX),thit1,temp
-      character*8 idbs(NMAX)
+      character*25 idbs(NMAX)
 c
 c------------------------------------------------------------------------------
 c
@@ -3717,7 +3717,7 @@ c Input/Output
       real*8 rce(nbod),rcrit(nbod),ngf(4,nbod),tclo(CMAX),dclo(CMAX)
       real*8 ixvclo(6,CMAX),jxvclo(6,CMAX)
       character*80 outfile(3),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer j,iflag,nhit,ihit(CMAX),jhit(CMAX),chit(CMAX),nowflag
@@ -5099,7 +5099,7 @@ c Input/Output
       real*8 time,tstart,rcen,rmax,m(nbod),tclo(nclo),dclo(nclo)
       real*8 ixvclo(6,nclo),jxvclo(6,nclo)
       character*80 outfile(3),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer k,year,month
@@ -5220,7 +5220,7 @@ c Input/Output
       real*8 jcen(3),rcen,cefac,m(nbod),x(3,nbod),v(3,nbod)
       real*8 s(3,nbod),rho(nbod),rceh(nbod),ngf(4,nbod),epoch(nbod)
       character*80 dumpfile(4),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer idp,i,j,k,len1,j1,j2
@@ -5269,9 +5269,9 @@ c Write header lines, data style (and epoch for Big bodies)
 c
 c For each body...
           do j = j1, j2
-            len1 = 37
-            c(1:8) = id(j)
-            write (c(9:37),'(1p,a3,e11.5,a3,e11.5)') ' r=',rceh(j),
+            len1 = 54
+            c(1:25) = id(j)
+            write (c(26:54),'(1p,a3,e11.5,a3,e11.5)') ' r=',rceh(j),
      %        ' d=',rho(j)/rhocgs
             if (m (j).gt.0d0) then
               write (c(len1+1:len1+25),'(a3,e22.15)') ' m=',m(j)*k_2
@@ -5554,7 +5554,7 @@ c Input/Output
       real*8 en(3),am(3),m(NMAX),x(3,NMAX),v(3,NMAX),s(3,NMAX)
       real*8 rho(NMAX),rceh(NMAX),epoch(NMAX),ngf(4,NMAX),cefac
       character*80 outfile(3),dumpfile(4), mem(NMESS)
-      character*8 id(NMAX)
+      character*25 id(NMAX)
 c
 c Local
       integer j,k,itmp,jtmp,informat,lim(2,10),nsub,year,month,lineno
@@ -5811,7 +5811,7 @@ c
           write (23,'(/,3a)') mem(121)(1:lmem(121)),
      %      mem(122)(1:lmem(122)),string( lim(1,1):lim(2,1) )
         end if
-        id(nbod) = string( lim(1,1):min(7+lim(1,1),lim(2,1)) )
+        id(nbod) = string( lim(1,1):min(24+lim(1,1),lim(2,1)) )
 c Check if another object has the same name
         do k = 1, nbod - 1
           if (id(k).eq.id(nbod)) call mio_err (23,mem(81),lmem(81),
@@ -6320,7 +6320,7 @@ c Input/Output
       real*8 time,jcen(3),rcen,rmax,m(nbod),xh(3,nbod),vh(3,nbod)
       real*8 s(3,nbod),rho(nbod)
       character*80 outfile
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer k, len1, nchar
@@ -6373,19 +6373,19 @@ c For each object, compress its index number, name, mass, spin components
 c and density (some of these need to be converted to normal units).
         do k = 2, nbod
           c(k)(1:8) = mio_re2c (dble(k - 1), 0.d0, 11239423.99d0)
-          c(k)(4:11) = id(k)
-          c(k)(12:19) = mio_fl2c (m(k) * k_2)
-          c(k)(20:27) = mio_fl2c (s(1,k) * k_2)
-          c(k)(28:35) = mio_fl2c (s(2,k) * k_2)
-          c(k)(36:43) = mio_fl2c (s(3,k) * k_2)
-          c(k)(44:51) = mio_fl2c (rho(k) / rhocgs)
+          c(k)(4:28) = id(k)
+          c(k)(29:36) = mio_fl2c (m(k) * k_2)
+          c(k)(37:44) = mio_fl2c (s(1,k) * k_2)
+          c(k)(45:52) = mio_fl2c (s(2,k) * k_2)
+          c(k)(53:60) = mio_fl2c (s(3,k) * k_2)
+          c(k)(61:68) = mio_fl2c (rho(k) / rhocgs)
         end do
 c
 c Write compressed output to file
         write (21,'(a1,a2,i2,a62,i1)') char(12),'6a',algor,header(1:62),
      %    opt(4)
         do k = 2, nbod
-          write (21,'(a51)') c(k)(1:51)
+          write (21,'(a68)') c(k)(1:68)
         end do
       end if
 c
@@ -6579,7 +6579,7 @@ c Input/Output
       real*8 time, tstart, rmax, en(3), am(3), jcen(3)
       real*8 m(nbod), x(3,nbod), v(3,nbod), s(3,nbod)
       character*80 outfile, mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer j, year, month
@@ -6611,18 +6611,18 @@ c Write message to information file
   20      open  (23,file=outfile,status='old',access='append',err=20)
           if (opt(3).eq.1) then
             call mio_jd2y (time,year,month,t1)
-            flost = '(1x,a8,a,i10,1x,i2,1x,f8.5)'
+            flost = '(1x,a25,a,i10,1x,i2,1x,f8.5)'
             write (23,flost) id(j),mem(68)(1:lmem(68)),year,month,t1
           else
             if (opt(3).eq.3) then
               t1 = (time - tstart) / 365.25d0
               tstring = mem(2)
-              flost = '(1x,a8,a,f18.7,a)'
+              flost = '(1x,a25,a,f18.7,a)'
             else
               if (opt(3).eq.0) t1 = time
               if (opt(3).eq.2) t1 = time - tstart
               tstring = mem(1)
-              flost = '(1x,a8,a,f18.5,a)'
+              flost = '(1x,a25,a,f18.5,a)'
             end if
             write (23,flost) id(j),mem(68)(1:lmem(68)),t1,tstring
           end if
@@ -6665,7 +6665,7 @@ c Input/Output
       integer nbod, nbig, nelim, stat(nbod), lmem(NMESS)
       real*8 m(nbod), x(3,nbod), v(3,nbod), s(3,nbod)
       real*8 rho(nbod), rceh(nbod), rcrit(nbod), ngf(4,nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
       character*80 outfile, mem(NMESS)
 c
 c Local
@@ -6983,14 +6983,14 @@ c Input/Output
       integer nbod,nbig,ngflag,opt(8),stat(nbod)
       real*8 time,tstart,h0,tol,jcen(3),m(nbod),x(3,nbod),v(3,nbod)
       real*8 s(3,nbod),rceh(nbod),rho(nbod),epoch(nbod),ngf(4,nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer j,k,l,nsml,nsofar,indx(NMAX),itemp,jtemp(NMAX)
       integer raflag,nce,ice(NMAX),jce(NMAX)
       real*8 temp,epsml(NMAX),rtemp(NMAX)
       real*8 h,hdid,tsmall,rphys(NMAX),rcrit(NMAX)
-      character*8 ctemp(NMAX)
+      character*25 ctemp(NMAX)
       external mfo_all
 c
 c------------------------------------------------------------------------------
