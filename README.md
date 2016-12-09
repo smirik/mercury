@@ -20,13 +20,10 @@ and answer "yes" for the question about creating sample files.
 THIS VERSION OF MERCURY6 PACKAGE WAS MODIFIED BY I. DOVGALEV
 TO PROVIDE TRUE DOUBLE PRECISION CALCULATIONS. ALSO, THE INITIAL DATA
 FOR PLANETS IN "big.in" FILE WAS UPDATED (see http://ssd.jpl.nasa.gov).
-FOR ANY QUESTIONS ABOUT THIS MODIFICATION PLEASE CONTACT WITH ME USING
-THIS E-MAIL:
-idovgalyov@4xxi.com
                                                             2016-12-05
-NEW UPDATE: Provided length for object names is now 25 (instead of 8 in
-older versions). Please take into account
-                                                            2016-12-08
+
+[2016-12-08]: Provided length for object names is now 25 (instead of 8
+in older versions). Please take into account.
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
