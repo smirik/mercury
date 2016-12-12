@@ -8,12 +8,4 @@ if [ "$1" != "-s" ]; then
     for i in *.sample; do
         cp $i `echo $i | sed 's/.sample//g'`
     done
-#else
-#    echo "Create input data files from samples? (yes/no)"
-#    read create_samples
-#    if [ $create_samples = 'yes' || $create_samples = 'y'] ; then
-#        for i in *.sample; do
-#            cp $i `echo $i | sed 's/.sample//g'`
-#        done
-#    fi
 fi
