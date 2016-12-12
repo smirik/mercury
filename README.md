@@ -26,7 +26,8 @@ FOR PLANETS IN "big.in" FILE WAS UPDATED (see http://ssd.jpl.nasa.gov).
 in older versions). Please take into account.
 
 [2016-12-12]: Compile.sh has been modified. Now to create input data
-files from samples run the compile.sh with key -s
+files from samples run the compile.sh simply. If you want to use your
+own input data files run compile.sh with key -s
 
 **Please note that if you use other programs to create input data files
 you must keep "fortran" double precision format (e.g. use "d" exponent)**
