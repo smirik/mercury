@@ -30,7 +30,7 @@ c
       logical test
       character*250 string,fout,header,infile(50)
       character*80 mem(NMESS),cc,c(NMAX)
-      character*8 master_id(NMAX),id(NMAX)
+      character*25 master_id(NMAX),id(NMAX)
       character*5 fin
       character*1 check,style,type,c1
       character*2 c2
@@ -123,8 +123,8 @@ c Read in the names of the objects for which orbital elements are required
 c
 c Either open an aei file for this object or put it on the waiting list
         nmaster = nmaster + 1
-        itmp = min(7,lim(2,1)-lim(1,1))
-        master_id(nmaster)='        '
+        itmp = min(25,lim(2,1)-lim(1,1))
+        master_id(nmaster)='                         '
         master_id(nmaster)(1:itmp+1) = string(lim(1,1):lim(1,1)+itmp)
         if (nopen.lt.NFILES) then
           nopen = nopen + 1
@@ -191,7 +191,7 @@ c
 c Read in strings containing compressed data for each object
           do j = 1, nbig + nsml
             line_num = line_num + 1
-            read (10,'(a)',err=666) c(j)(1:51)
+            read (10,'(a)',err=666) c(j)(1:68)
           end do
 c
 c Create input format list
@@ -205,12 +205,12 @@ c
 c For each object decompress its name, code number, mass, spin and density
           do j = 1, nbig + nsml
             k = int(.5d0 + mio_c2re(c(j)(1:8),0.d0,11239424.d0,3))
-            id(k) = c(j)(4:11)
-            el(18,k) = mio_c2fl (c(j)(12:19))
-            s(1) = mio_c2fl (c(j)(20:27))
-            s(2) = mio_c2fl (c(j)(28:35))
-            s(3) = mio_c2fl (c(j)(36:43))
-            el(21,k) = mio_c2fl (c(j)(44:51))
+            id(k) = c(j)(4:28)
+            el(18,k) = mio_c2fl (c(j)(29:36))
+            s(1) = mio_c2fl (c(j)(37:44))
+            s(2) = mio_c2fl (c(j)(45:52))
+            s(3) = mio_c2fl (c(j)(53:60))
+            el(21,k) = mio_c2fl (c(j)(61:68))
 c
 c Calculate spin rate and longitude & inclination of spin vector
             temp = sqrt(s(1)*s(1) + s(2)*s(2) + s(3)*s(3))
@@ -472,7 +472,8 @@ c
 c------------------------------------------------------------------------------
 c
 c Format statements
- 213  format (1x,a8,1x,f8.4,1x,f7.5,1x,f7.3,1p,e11.4,0p,1x,f6.3,1x,f6.2)
+ 213  format (1x,a25,1x,f8.4,1x,f7.5,1x,f7.3,
+     % 1p,e11.4,0p,1x,f6.3,1x,f6.2)
 c
       end
 c
@@ -932,7 +933,7 @@ c
 c Input/Output
       integer unitnum,lenhead,lmem(NMESS)
       character*4 extn
-      character*8 id
+      character*25 id
       character*250 header
       character*80 mem(NMESS)
 c
@@ -947,8 +948,8 @@ c
       data bad/ '*', '/', '.', ':', '&'/
 c
 c Create a filename based on the object's name
-      call mio_spl (8,id,nsub,lim)
-      itmp = min(7,lim(2,1)-lim(1,1))
+      call mio_spl (25,id,nsub,lim)
+      itmp = min(24,lim(2,1)-lim(1,1))
       filename(1:itmp+1) = id(1:itmp+1)
       filename(itmp+2:itmp+5) = extn
       do j = itmp + 6, 250
@@ -970,7 +971,7 @@ c If the file exists already, give a warning and don't overwrite it
         unitnum = -1
       else
         open (unitnum, file=filename, status='new')
-        write (unitnum, '(/,30x,a8,//,a)') id,header(1:lenhead)
+        write (unitnum, '(/,30x,a25,//,a)') id,header(1:lenhead)
       end if
 c
 c------------------------------------------------------------------------------

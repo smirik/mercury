@@ -20,9 +20,18 @@ and answer "yes" for the question about creating sample files.
 THIS VERSION OF MERCURY6 PACKAGE WAS MODIFIED BY I. DOVGALEV
 TO PROVIDE TRUE DOUBLE PRECISION CALCULATIONS. ALSO, THE INITIAL DATA
 FOR PLANETS IN "big.in" FILE WAS UPDATED (see http://ssd.jpl.nasa.gov).
-FOR ANY QUESTIONS ABOUT THIS MODIFICATION PLEASE CONTACT WITH ME USING
-THIS E-MAIL:
-idovgalyov@4xxi.com                                         2016-12-05
+**2016-12-05**
+
+[2016-12-08]: Provided length for object names is now 25 (instead of 8
+in older versions). Please take into account.
+
+[2016-12-12]: Compile.sh has been modified. Now to create input data
+files from samples run the compile.sh simply. If you want to use your
+own input data files run compile.sh with key -s
+
+**Please note that if you use other programs to create input data files
+you must keep "fortran" double precision format (e.g. use "d" exponent)**
+
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
