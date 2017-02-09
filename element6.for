@@ -30,7 +30,7 @@ c
       logical test
       character*250 string,fout,header,infile(50)
       character*80 mem(NMESS),cc,c(NMAX)
-      character*8 master_id(NMAX),id(NMAX)
+      character*25 master_id(NMAX),id(NMAX)
       character*5 fin
       character*1 check,style,type,c1
       character*2 c2
@@ -123,8 +123,8 @@ c Read in the names of the objects for which orbital elements are required
 c
 c Either open an aei file for this object or put it on the waiting list
         nmaster = nmaster + 1
-        itmp = min(7,lim(2,1)-lim(1,1))
-        master_id(nmaster)='        '
+        itmp = min(25,lim(2,1)-lim(1,1))
+        master_id(nmaster)='                         '
         master_id(nmaster)(1:itmp+1) = string(lim(1,1):lim(1,1)+itmp)
         if (nopen.lt.NFILES) then
           nopen = nopen + 1
@@ -191,7 +191,7 @@ c
 c Read in strings containing compressed data for each object
           do j = 1, nbig + nsml
             line_num = line_num + 1
-            read (10,'(a)',err=666) c(j)(1:51)
+            read (10,'(a)',err=666) c(j)(1:68)
           end do
 c
 c Create input format list
@@ -205,16 +205,16 @@ c
 c For each object decompress its name, code number, mass, spin and density
           do j = 1, nbig + nsml
             k = int(.5d0 + mio_c2re(c(j)(1:8),0.d0,11239424.d0,3))
-            id(k) = c(j)(4:11)
-            el(18,k) = mio_c2fl (c(j)(12:19))
-            s(1) = mio_c2fl (c(j)(20:27))
-            s(2) = mio_c2fl (c(j)(28:35))
-            s(3) = mio_c2fl (c(j)(36:43))
-            el(21,k) = mio_c2fl (c(j)(44:51))
+            id(k) = c(j)(4:28)
+            el(18,k) = mio_c2fl (c(j)(29:36))
+            s(1) = mio_c2fl (c(j)(37:44))
+            s(2) = mio_c2fl (c(j)(45:52))
+            s(3) = mio_c2fl (c(j)(53:60))
+            el(21,k) = mio_c2fl (c(j)(61:68))
 c
 c Calculate spin rate and longitude & inclination of spin vector
             temp = sqrt(s(1)*s(1) + s(2)*s(2) + s(3)*s(3))
-            if (temp.gt.0) then
+            if (temp.gt.0d0) then
               call mce_spin (1.d0,el(18,k)*K2,temp*K2,el(21,k)*
      %            rhocgs,el(20,k))
               temp = s(3) / temp
@@ -222,8 +222,8 @@ c Calculate spin rate and longitude & inclination of spin vector
                 is(k) = acos (temp)
                 ns(k) = atan2 (s(1), -s(2))
               else
-                if (temp.gt.0) is(k) = 0.d0
-                if (temp.lt.0) is(k) = PI
+                if (temp.gt.0d0) is(k) = 0.d0
+                if (temp.lt.0d0) is(k) = PI
                 ns(k) = 0.d0
               end if
             else
@@ -344,13 +344,13 @@ c Convert to Keplerian orbital elements
             el(9,k) = el(1,k) * (1.d0 + el(2,k))
             el(4,k) = mod(el(7,k) - el(5,k) + TWOPI, TWOPI)
 c Calculate true anomaly
-            if (el(2,k).eq.0) then
+            if (el(2,k).eq.0d0) then
               el(17,k) = el(6,k)
             else
               temp = (el(8,k)*(1.d0 + el(2,k))/el(16,k) - 1.d0) /el(2,k)
               temp = sign (min(abs(temp), 1.d0), temp)
               el(17,k) = acos(temp)
-              if (sin(el(6,k)).lt.0) el(17,k) = TWOPI - el(17,k)
+              if (sin(el(6,k)).lt.0d0) el(17,k) = TWOPI - el(17,k)
             end if
 c Calculate obliquity
             el(19,k) = acos (cos(el(3,k))*cos(is(k))
@@ -472,7 +472,8 @@ c
 c------------------------------------------------------------------------------
 c
 c Format statements
- 213  format (1x,a8,1x,f8.4,1x,f7.5,1x,f7.3,1p,e11.4,0p,1x,f6.3,1x,f6.2)
+ 213  format (1x,a25,1x,f8.4,1x,f7.5,1x,f7.3,
+     % 1p,e11.4,0p,1x,f6.3,1x,f6.2)
 c
       end
 c
@@ -756,8 +757,8 @@ c Improved value using Halley's method
           x = u1
         end if
         x2 = x*x
-        sn = x*(1.d0 + x2*(-.16605 + x2*.00761) )
-        dsn = 1.d0 + x2*(-.49815 + x2*.03805)
+        sn = x*(1.d0 + x2*(-.16605d0 + x2*.00761d0) )
+        dsn = 1.d0 + x2*(-.49815d0 + x2*.03805d0)
         if (flag) dsn = -dsn
         f2 = e*sn
         f0 = u1 - f2 - l
@@ -804,12 +805,13 @@ c
       x2 = x*x
       ss = 1.d0
       cc = 1.d0
-c
-      ss = x*x2/6.*(1. - x2/20.*(1. - x2/42.*(1. - x2/72.*(1. -
-     %   x2/110.*(1. - x2/156.*(1. - x2/210.*(1. - x2/272.)))))))
-      cc =   x2/2.*(1. - x2/12.*(1. - x2/30.*(1. - x2/56.*(1. -
-     %   x2/ 90.*(1. - x2/132.*(1. - x2/182.*(1. - x2/240.*(1. -
-     %   x2/306.))))))))
+c----------------------------------------------------------------
+      ss = x*x2/6.d0*(1.d0 - x2/20.d0*(1.d0 - x2/42.d0*(1.d0 - 
+     % x2/72.d0*(1.d0 - x2/110.d0*(1.d0 - x2/156.d0*(1.d0 - 
+     % x2/210.d0*(1.d0 - x2/272.d0)))))))
+      cc =   x2/2.d0*(1.d0 - x2/12.d0*(1.d0 - x2/30.d0*(1.d0 - 
+     % x2/56.d0*(1.d0 - x2/ 90.d0*(1.d0 - x2/132.d0*(1.d0 - 
+     % x2/182.d0*(1.d0 - x2/240.d0*(1.d0 - x2/306.d0))))))))
 c
       if (big) then
         z1 = cc + z3 - 1.d0
@@ -864,7 +866,7 @@ c
       pi = 3.141592653589793d0
       twopi = 2.d0 * pi
 c
-      if (x.gt.0) then
+      if (x.gt.0d0) then
         x = mod(x,twopi)
       else
         x = mod(x,twopi) + twopi
@@ -931,7 +933,7 @@ c
 c Input/Output
       integer unitnum,lenhead,lmem(NMESS)
       character*4 extn
-      character*8 id
+      character*25 id
       character*250 header
       character*80 mem(NMESS)
 c
@@ -946,8 +948,8 @@ c
       data bad/ '*', '/', '.', ':', '&'/
 c
 c Create a filename based on the object's name
-      call mio_spl (8,id,nsub,lim)
-      itmp = min(7,lim(2,1)-lim(1,1))
+      call mio_spl (25,id,nsub,lim)
+      itmp = min(24,lim(2,1)-lim(1,1))
       filename(1:itmp+1) = id(1:itmp+1)
       filename(itmp+2:itmp+5) = extn
       do j = itmp + 6, 250
@@ -969,7 +971,7 @@ c If the file exists already, give a warning and don't overwrite it
         unitnum = -1
       else
         open (unitnum, file=filename, status='new')
-        write (unitnum, '(/,30x,a8,//,a)') id,header(1:lenhead)
+        write (unitnum, '(/,30x,a25,//,a)') id,header(1:lenhead)
       end if
 c
 c------------------------------------------------------------------------------
@@ -1398,16 +1400,16 @@ c Inclination and node
       if (abs(ci).lt.1) then
         i = acos (ci)
         n = atan2 (hx,-hy)
-        if (n.lt.0) n = n + TWOPI
+        if (n.lt.0d0) n = n + TWOPI
       else
-        if (ci.gt.0) i = 0.d0
-        if (ci.lt.0) i = PI
+        if (ci.gt.0d0) i = 0.d0
+        if (ci.lt.0d0) i = PI
         n = 0.d0
       end if
 c
 c Eccentricity and perihelion distance
       temp = 1.d0  +  s * (v2 / gm  -  2.d0 / r)
-      if (temp.le.0) then
+      if (temp.le.0d0) then
         e = 0.d0
       else
         e = sqrt (temp)
@@ -1415,7 +1417,7 @@ c Eccentricity and perihelion distance
       q = s / (1.d0 + e)
 c
 c True longitude
-      if (hy.ne.0) then
+      if (hy.ne.0d0) then
         to = -hx/hy
         temp = (1.d0 - ci) * to
         tmp2 = to * to
@@ -1423,7 +1425,7 @@ c True longitude
       else
         true = atan2(y * ci, x)
       end if
-      if (ci.lt.0) true = true + PI
+      if (ci.lt.0d0) true = true + PI
 c
       if (e.lt.3.d-8) then
         p = 0.d0
@@ -1432,31 +1434,31 @@ c
         ce = (v2*r - gm) / (e*gm)
 c
 c Mean anomaly for ellipse
-        if (e.lt.1) then
-          if (abs(ce).gt.1) ce = sign(1.d0,ce)
+        if (e.lt.1d0) then
+          if (abs(ce).gt.1d0) ce = sign(1.d0,ce)
           bige = acos(ce)
-          if (rv.lt.0) bige = TWOPI - bige
+          if (rv.lt.0d0) bige = TWOPI - bige
           l = bige - e*sin(bige)
         else
 c
 c Mean anomaly for hyperbola
-          if (ce.lt.1) ce = 1.d0
+          if (ce.lt.1d0) ce = 1.d0
           bige = log( ce + sqrt(ce*ce-1.d0) )
-          if (rv.lt.0) bige = - bige
+          if (rv.lt.0d0) bige = - bige
           l = e*sinh(bige) - bige
         end if
 c
 c Longitude of perihelion
         cf = (s - r) / (e*r)
-        if (abs(cf).gt.1) cf = sign(1.d0,cf)
+        if (abs(cf).gt.1d0) cf = sign(1.d0,cf)
         f = acos(cf)
-        if (rv.lt.0) f = TWOPI - f
+        if (rv.lt.0d0) f = TWOPI - f
         p = true - f
         p = mod (p + TWOPI + TWOPI, TWOPI)
       end if
 c
-      if (l.lt.0.and.e.lt.1) l = l + TWOPI
-      if (l.gt.TWOPI.and.e.lt.1) l = mod (l, TWOPI)
+      if (l.lt.0d0.and.e.lt.1d0) l = l + TWOPI
+      if (l.gt.TWOPI.and.e.lt.1d0) l = mod (l, TWOPI)
 c
 c------------------------------------------------------------------------------
 c
@@ -1501,7 +1503,7 @@ c Local
 c
 c------------------------------------------------------------------------------
 c
-      if (jd0.le.0) goto 50
+      if (jd0.le.0d0) goto 50
 c
       jd = jd0 + 0.5d0
       i = sign( dint(dabs(jd)), jd )
@@ -1534,8 +1536,8 @@ c
       if (month.gt.2) year = d - 4716
       if (month.le.2) year = d - 4715
 c
-      if (day.gt.32) then
-        day = day - 32
+      if (day.gt.32d0) then
+        day = day - 32d0
         month = month + 1
       end if
 c
@@ -1548,7 +1550,7 @@ c
   50  continue
 c
 c Algorithm for negative Julian day numbers (Duffett-Smith won't work)
-      x = jd0 - 2232101.5
+      x = jd0 - 2232101.5d0
       f = x - dint(x)
       if (f.lt.0) f = f + 1.d0
       y = dint(mod(x,1461.d0) + 1461.d0)
@@ -1558,7 +1560,7 @@ c Algorithm for negative Julian day numbers (Duffett-Smith won't work)
       month = mod(month + 2, 12) + 1
 c
       year = 1399 + int (x / 365.25d0)
-      if (x.lt.0) year = year - 1
+      if (x.lt.0d0) year = year - 1
       if (month.lt.3) year = year + 1
 c
 c------------------------------------------------------------------------------
@@ -1582,13 +1584,13 @@ c Substrings are those which are separated by spaces or the = symbol.
 c
 c------------------------------------------------------------------------------
 c
-      subroutine mio_spl (len,string,nsub,delimit)
+      subroutine mio_spl (len1,string,nsub,delimit)
 c
       implicit none
 c
 c Input/Output
-      integer len,nsub,delimit(2,100)
-      character*1 string(len)
+      integer len1,nsub,delimit(2,100)
+      character*1 string(len1)
 c
 c Local
       integer j,k
@@ -1603,14 +1605,14 @@ c
 c
 c Find the start of string
   10  j = j + 1
-      if (j.gt.len) goto 99
+      if (j.gt.len1) goto 99
       c = string(j)
       if (c.eq.' '.or.c.eq.'=') goto 10
 c
 c Find the end of string
       k = j
   20  k = k + 1
-      if (k.gt.len) goto 30
+      if (k.gt.len1) goto 30
       c = string(k)
       if (c.ne.' '.and.c.ne.'=') goto 20
 c
@@ -1619,7 +1621,7 @@ c Store details for this string
       delimit(1,nsub) = j
       delimit(2,nsub) = k - 1
 c
-      if (k.lt.len) then
+      if (k.lt.len1) then
         j = k
         goto 10
       end if
@@ -2030,9 +2032,9 @@ c  Begin with a reasonable guess based on solving the cubic for small F
 
 	a = 6.d0*(e-1.d0)/e
 	b = -6.d0*capn/e
-	sq = sqrt(0.25*b*b +a*a*a/27.d0)
-	biga = (-0.5*b + sq)**0.3333333333333333d0
-	bigb = -(+0.5*b + sq)**0.3333333333333333d0
+	sq = sqrt(0.25d0*b*b +a*a*a/27.d0)
+	biga = (-0.5d0*b + sq)**0.3333333333333333d0
+	bigb = -(+0.5d0*b + sq)**0.3333333333333333d0
 	x = biga + bigb
 c	write(6,*) 'cubic = ',x**3 +a*x +b
 	orbel_flon = x
@@ -2118,7 +2120,7 @@ c...  Executable code
 	if (q.lt.1.d-3) then
 	   orbel_zget = q*(1.d0 - (q*q/3.d0)*(1.d0 -q*q))
 	else
-	   x = 0.5d0*(3.d0*q + sqrt(9.d0*(q**2) +4.d0))
+	   x = 0.5d0*(3.d0*q + sqrt(9.d0*(q**2d0) +4.d0))
 	   tmp = x**(1.d0/3.d0)
 	   orbel_zget = tmp - 1.d0/tmp
 	endif

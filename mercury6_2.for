@@ -37,7 +37,7 @@ c  S      = spin angular momentum (solar masses AU^2/day)
 c  RHO    = physical density (g/cm^3)
 c  RCEH   = close-encounter limit (Hill radii)
 c  STAT   = status (0 => alive, <>0 => to be removed)
-c  ID     = name of the object (8 characters)
+c  ID     = name of the object (25 characters)
 c  CE     = close encounter status
 c  NGF    = (1-3) cometary non-gravitational (jet) force parameters
 c   "     =  (4)  beta parameter for radiation pressure and P-R drag
@@ -117,7 +117,7 @@ c
       real*8 m(NMAX),xh(3,NMAX),vh(3,NMAX),s(3,NMAX),rho(NMAX)
       real*8 rceh(NMAX),epoch(NMAX),ngf(4,NMAX),rmax,rcen,jcen(3)
       real*8 cefac,time,tstart,tstop,dtout,h0,tol,en(3),am(3)
-      character*8 id(NMAX)
+      character*25 id(NMAX)
       character*80 outfile(3), dumpfile(4), mem(NMESS)
       external mdt_mvs, mdt_bs1, mdt_bs2, mdt_ra15, mdt_hy
       external mco_dh2h,mco_h2dh
@@ -280,7 +280,7 @@ c Input/Output
       real*8 time,tstart,tstop,dtout,h0,tol,jcen(3),rcen,rmax
       real*8 en(3),am(3),cefac,m(nbod),xh(3,nbod),vh(3,nbod)
       real*8 s(3,nbod),rho(nbod),rceh(nbod),ngf(4,nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
       character*80 outfile(3),dumpfile(4),mem(NMESS)
 c
 c Local
@@ -318,7 +318,7 @@ c Set up time of next output, times of previous dump, log and periodic effect
       else
         n = int (abs (time - tstart) / dtout) + 1
         tout = tstart  +  dtout * sign (dble(n), tstop - tstart)
-        if ((tstop - tstart)*(tout - tstop).gt.0) tout = tstop
+        if ((tstop - tstart)*(tout - tstop).gt.0d0) tout = tstop
       end if
       tdump = time
       tfun  = time
@@ -534,7 +534,7 @@ c Input/Output
       real*8 time,tstart,tstop,dtout,h0,tol,jcen(3),rcen,rmax
       real*8 en(3),am(3),cefac,m(nbod),xh(3,nbod),vh(3,nbod)
       real*8 s(3,nbod),rho(nbod),rceh(nbod),ngf(4,nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
       character*80 outfile(3),dumpfile(4),mem(NMESS)
 c
 c Local
@@ -831,16 +831,16 @@ c
         ymax(j) = max (x0(2,j), x1(2,j))
 c
 c If velocity changes sign, do an interpolation
-        if ((v0(1,j).lt.0.and.v1(1,j).gt.0).or.
-     %      (v0(1,j).gt.0.and.v1(1,j).lt.0)) then
+        if ((v0(1,j).lt.0d0.and.v1(1,j).gt.0d0).or.
+     %      (v0(1,j).gt.0d0.and.v1(1,j).lt.0d0)) then
           temp = (v0(1,j)*x1(1,j) - v1(1,j)*x0(1,j) 
      %            - .5d0*h*v0(1,j)*v1(1,j)) / (v0(1,j) - v1(1,j))
           xmin(j) = min (xmin(j),temp)
           xmax(j) = max (xmax(j),temp)
         end if
 c
-        if ((v0(2,j).lt.0.and.v1(2,j).gt.0).or.
-     %      (v0(2,j).gt.0.and.v1(2,j).lt.0)) then
+        if ((v0(2,j).lt.0d0.and.v1(2,j).gt.0d0).or.
+     %      (v0(2,j).gt.0d0.and.v1(2,j).lt.0d0)) then
           temp = (v0(2,j)*x1(2,j) - v1(2,j)*x0(2,j) 
      %            - .5d0*h*v0(2,j)*v1(2,j)) / (v0(2,j) - v1(2,j))
           ymin(j) = min (ymin(j),temp)
@@ -916,7 +916,8 @@ c Check for collisions with the central body
         end if
 c
 c If inside the central body, or passing through pericentre, use 2-body approx.
-        if ((rv0*h.le.0.and.rv1*h.ge.0).or.min(rr0,rr1).le.rcen2) then
+        if ((rv0*h.le.0d0.and.rv1*h.ge.0d0)
+     %   .or.min(rr0,rr1).le.rcen2) then
           if (algor.eq.11) then
             hx = xu0(2,j) * vu0(3,j)  -  xu0(3,j) * vu0(2,j)
             hy = xu0(3,j) * vu0(1,j)  -  xu0(1,j) * vu0(3,j)
@@ -942,7 +943,7 @@ c If the object hit the central body
             dhit(nhit) = rcen
 c
 c Time of impact relative to the end of the timestep
-            if (e.lt.1) then
+            if (e.lt.1d0) then
               a = q / (1.d0 - e)
               uhit = sign (acos((1.d0 - rcen/a)/e), -h)
               u0   = sign (acos((1.d0 - r0/a  )/e), rv0)
@@ -994,7 +995,7 @@ c Input/Output
       real*8 time,tstart,elost,jcen(3)
       real*8 m(nbod),xh(3,nbod),vh(3,nbod),s(3,nbod),rphys(nbod)
       character*80 outfile,mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer year,month,itmp
@@ -1020,10 +1021,10 @@ c
       if (opt(3).eq.1) then
         call mio_jd2y (time,year,month,t1)
         if (i.eq.0) then
-          flost = '(1x,a8,a,i10,1x,i2,1x,f8.5)'
+          flost = '(1x,a25,a,i10,1x,i2,1x,f8.5)'
           write (23,flost) id(j),mem(67)(1:lmem(67)),year,month,t1
         else
-          fcol  = '(1x,a8,a,a8,a,i10,1x,i2,1x,f4.1)'
+          fcol  = '(1x,a25,a,a25,a,i10,1x,i2,1x,f4.1)'
           write (23,fcol) id(i),mem(69)(1:lmem(69)),id(j),
      %      mem(71)(1:lmem(71)),year,month,t1
         end if
@@ -1031,14 +1032,14 @@ c
         if (opt(3).eq.3) then
           t1 = (time - tstart) / 365.25d0
           tstring = mem(2)
-          flost = '(1x,a8,a,f18.7,a)'
-          fcol  = '(1x,a8,a,a8,a,1x,f14.3,a)'
+          flost = '(1x,a25,a,f18.7,a)'
+          fcol  = '(1x,a25,a,a25,a,1x,f14.3,a)'
         else
           if (opt(3).eq.0) t1 = time
           if (opt(3).eq.2) t1 = time - tstart
           tstring = mem(1)
-          flost = '(1x,a8,a,f18.5,a)'
-          fcol  = '(1x,a8,a,a8,a,1x,f14.1,a)'
+          flost = '(1x,a25,a,f18.5,a)'
+          fcol  = '(1x,a25,a,a25,a,1x,f14.1,a)'
         end if
         if (i.eq.0.or.i.eq.1) then
           write (23,flost) id(j),mem(67)(1:lmem(67)),t1,tstring
@@ -1102,7 +1103,7 @@ c
         call mco_x2a (gm,x(1,j),x(2,j),x(3,j),v(1,j),v(2,j),v(3,j),a(j),
      %    r,v2)
 c If orbit is hyperbolic, use the distance rather than the semi-major axis
-        if (a(j).le.0) a(j) = r
+        if (a(j).le.0d0) a(j) = r
         hill(j) = a(j) * (THIRD * m(j) / m(1))**THIRD
       end do
 c
@@ -1148,7 +1149,7 @@ c Input/Output
       real*8 tstart,h,jcen(3),rcen,rmax,cefac,m(nbod),x(3,nbod)
       real*8 v(3,nbod),s(3,nbod),rho(nbod),rceh(nbod),rphys(nbod)
       real*8 rce(nbod),rcrit(nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
       character*80 outfile
 c
 c Local
@@ -1197,12 +1198,12 @@ c Write list of object's identities to close-encounter output file
 c
       do j = 2, nbod
         c(j)(1:8) = mio_re2c (dble(j - 1), 0.d0, 11239423.99d0)
-        c(j)(4:11) = id(j)
-        c(j)(12:19) = mio_fl2c (m(j) * k_2)
-        c(j)(20:27) = mio_fl2c (s(1,j) * k_2)
-        c(j)(28:35) = mio_fl2c (s(2,j) * k_2)
-        c(j)(36:43) = mio_fl2c (s(3,j) * k_2)
-        c(j)(44:51) = mio_fl2c (rho(j) / rhocgs)
+        c(j)(4:28) = id(j)
+        c(j)(29:36) = mio_fl2c (m(j) * k_2)
+        c(j)(37:44) = mio_fl2c (s(1,j) * k_2)
+        c(j)(45:52) = mio_fl2c (s(2,j) * k_2)
+        c(j)(53:60) = mio_fl2c (s(3,j) * k_2)
+        c(j)(61:68) = mio_fl2c (rho(j) / rhocgs)
       end do
 c
 c Write compressed output to file
@@ -1210,7 +1211,7 @@ c Write compressed output to file
       write (22,'(a1,a2,i2,a62,i1)') char(12),'6a',algor,header(1:62),
      %  opt(4)
       do j = 2, nbod
-        write (22,'(a51)') c(j)(1:51)
+        write (22,'(a68)') c(j)(1:68)
       end do
       close (22)
 c
@@ -1383,7 +1384,7 @@ c Local
 c
 c------------------------------------------------------------------------------
 c
-      if (d0t*h.gt.0.or.d1t*h.lt.0) then
+      if (d0t*h.gt.0d0.or.d1t*h.lt.0d0) then
         if (d0.le.d1) then
           d2min = d0
           tmin = -h
@@ -1398,7 +1399,7 @@ c
         c = h * d1t
 c
         temp =-.5d0*(b + sign (sqrt(max(b*b - 4.d0*a*c,0.d0)), b) )
-        if (temp.eq.0) then
+        if (temp.eq.0d0) then
           tau = 0.d0
         else
           tau = c / temp
@@ -1642,7 +1643,7 @@ c Estimate minimum separation during the time interval, using interpolation
 c
 c If the minimum separation qualifies as an encounter or if a collision
 c is in progress, store details
-            if ((d2min.le.d2ce.and.d0t*h.le.0.and.d1t*h.ge.0)
+            if ((d2min.le.d2ce.and.d0t*h.le.0d0.and.d1t*h.ge.0d0)
      %        .or.(d2min.le.d2hit)) then
               nclo = nclo + 1
               if (nclo.gt.CMAX) then
@@ -1698,7 +1699,7 @@ c Make sure the more massive body is listed first
               end if
 c
 c Is this the collision closest to the start of the time step?
-              if ((tmin-thit1)*h.lt.0) then
+              if ((tmin-thit1)*h.lt.0d0) then
                 thit1 = tmin
                 nowflag = 0
                 if (d1.le.d2hit) nowflag = 1
@@ -2600,7 +2601,7 @@ c
       piby2 = .5d0 * pi
 c
 c Reduce mean anomaly to lie in the range 0 < l < pi
-      if (oldl.ge.0) then
+      if (oldl.ge.0d0) then
         l = mod(oldl, twopi)
       else
         l = mod(oldl, twopi) + twopi
@@ -2637,8 +2638,8 @@ c Improved value using Halley's method
           x = u1
         end if
         x2 = x*x
-        sn = x*(1.d0 + x2*(-.16605 + x2*.00761) )
-        dsn = 1.d0 + x2*(-.49815 + x2*.03805)
+        sn = x*(1.d0 + x2*(-.16605d0 + x2*.00761d0) )
+        dsn = 1.d0 + x2*(-.49815d0 + x2*.03805d0)
         if (flag) dsn = -dsn
         f2 = e*sn
         f0 = u1 - f2 - l
@@ -2654,7 +2655,7 @@ c Rough starting value for eccentric anomaly
         p = ome / z1
         q = .5d0 * l / z1
         p2 = p*p
-        z2 = exp( log( dsqrt( p2*p + q*q ) + q )/1.5 )
+        z2 = exp( log( dsqrt( p2*p + q*q ) + q )/1.5d0 )
         u1 = 2.d0*q / ( z2 + p + p2/z2 )
 c
 c Improved value using Newton's method
@@ -2686,11 +2687,13 @@ c
       ss = 1.d0
       cc = 1.d0
 c
-      ss = x*x2/6.*(1. - x2/20.*(1. - x2/42.*(1. - x2/72.*(1. -
-     %   x2/110.*(1. - x2/156.*(1. - x2/210.*(1. - x2/272.)))))))
-      cc =   x2/2.*(1. - x2/12.*(1. - x2/30.*(1. - x2/56.*(1. -
-     %   x2/ 90.*(1. - x2/132.*(1. - x2/182.*(1. - x2/240.*(1. -
-     %   x2/306.))))))))
+      ss = x*x2/6.d0*(1.d0 - x2/20.d0*(1.d0 - x2/42.d0*(1.d0 -
+     % x2/72.d0*(1.d0 - x2/110.d0*(1.d0 - x2/156.d0*(1.d0 -
+     % x2/210.d0*(1.d0 - x2/272.d0)))))))
+      cc =   x2/2.d0*(1.d0 - x2/12.d0*(1.d0 - x2/30.d0*(1.d0 -
+     % x2/56.d0*(1.d0 - x2/ 90.d0*(1.d0 - x2/132.d0*(1.d0 - 
+     % x2/182.d0*(1.d0 - x2/240.d0*(1.d0 - x2/306.d0))))))))
+        
 c
       if (big) then
         z1 = cc + z3 - 1.d0
@@ -2745,7 +2748,7 @@ c
       pi = 3.141592653589793d0
       twopi = 2.d0 * pi
 c
-      if (x.gt.0) then
+      if (x.gt.0d0) then
         x = mod(x,twopi)
       else
         x = mod(x,twopi) + twopi
@@ -2921,19 +2924,19 @@ c
 c
 c Inclination and node
       ci = hz / h
-      if (abs(ci).lt.1) then
+      if (abs(ci).lt.1d0) then
         i = acos (ci)
         n = atan2 (hx,-hy)
-        if (n.lt.0) n = n + TWOPI
+        if (n.lt.0d0) n = n + TWOPI
       else
-        if (ci.gt.0) i = 0.d0
-        if (ci.lt.0) i = PI
+        if (ci.gt.0d0) i = 0.d0
+        if (ci.lt.0d0) i = PI
         n = 0.d0
       end if
 c
 c Eccentricity and perihelion distance
       temp = 1.d0  +  s * (v2 / gm  -  2.d0 / r)
-      if (temp.le.0) then
+      if (temp.le.0d0) then
         e = 0.d0
       else
         e = sqrt (temp)
@@ -2941,7 +2944,7 @@ c Eccentricity and perihelion distance
       q = s / (1.d0 + e)
 c
 c True longitude
-      if (hy.ne.0) then
+      if (hy.ne.0d0) then
         to = -hx/hy
         temp = (1.d0 - ci) * to
         tmp2 = to * to
@@ -2949,7 +2952,7 @@ c True longitude
       else
         true = atan2(y * ci, x)
       end if
-      if (ci.lt.0) true = true + PI
+      if (ci.lt.0d0) true = true + PI
 c
       if (e.lt.3.d-8) then
         p = 0.d0
@@ -2958,17 +2961,17 @@ c
         ce = (v2*r - gm) / (e*gm)
 c
 c Mean anomaly for ellipse
-        if (e.lt.1) then
-          if (abs(ce).gt.1) ce = sign(1.d0,ce)
+        if (e.lt.1d0) then
+          if (abs(ce).gt.1d0) ce = sign(1.d0,ce)
           bige = acos(ce)
-          if (rv.lt.0) bige = TWOPI - bige
+          if (rv.lt.0d0) bige = TWOPI - bige
           l = bige - e*sin(bige)
         else
 c
 c Mean anomaly for hyperbola
-          if (ce.lt.1) ce = 1.d0
+          if (ce.lt.1d0) ce = 1.d0
           bige = log( ce + sqrt(ce*ce-1.d0) )
-          if (rv.lt.0) bige = - bige
+          if (rv.lt.0d0) bige = - bige
           l = e*sinh(bige) - bige
         end if
 c
@@ -2976,12 +2979,12 @@ c Longitude of perihelion
         cf = (s - r) / (e*r)
         if (abs(cf).gt.1) cf = sign(1.d0,cf)
         f = acos(cf)
-        if (rv.lt.0) f = TWOPI - f
+        if (rv.lt.0d0) f = TWOPI - f
         p = true - f
         p = mod (p + TWOPI + TWOPI, TWOPI)
       end if
 c
-      if (l.lt.0) l = l + TWOPI
+      if (l.lt.0d0) l = l + TWOPI
       if (l.gt.TWOPI) l = mod (l, TWOPI)
 c
 c------------------------------------------------------------------------------
@@ -3400,7 +3403,7 @@ c Input/Output
       real*8 rce(nbod),rcrit(nbod),ngf(4,nbod),tclo(CMAX),dclo(CMAX)
       real*8 ixvclo(6,CMAX),jxvclo(6,CMAX)
       character*80 outfile(3),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer j,nce,ice(NMAX),jce(NMAX),ce(NMAX),iflag
@@ -3557,7 +3560,7 @@ c Input/Output
       real*8 rce(nbod),rphy(nbod),rcrit(nbod),ngf(4,nbod)
       real*8 tclo(CMAX),dclo(CMAX),ixvclo(6,CMAX),jxvclo(6,CMAX)
       character*80 outfile(3),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
       external force
 c
 c Local
@@ -3569,7 +3572,7 @@ c Local
       real*8 rcritbs(NMAX),rcebs(NMAX),rphybs(NMAX)
       real*8 ngfbs(4,NMAX),x0(3,NMAX),v0(3,NMAX)
       real*8 thit(CMAX),dhit(CMAX),thit1,temp
-      character*8 idbs(NMAX)
+      character*25 idbs(NMAX)
 c
 c------------------------------------------------------------------------------
 c
@@ -3651,7 +3654,7 @@ c If collisions occurred, resolve the collision and return a flag
         end if
 c
 c If necessary, continue integrating objects undergoing close encounters
-      if ((tlocal - h0)*h0.lt.0) goto 50
+      if ((tlocal - h0)*h0.lt.0d0) goto 50
 c
 c Return data for the close-encounter objects to global arrays
       do k = 2, nbs
@@ -3714,7 +3717,7 @@ c Input/Output
       real*8 rce(nbod),rcrit(nbod),ngf(4,nbod),tclo(CMAX),dclo(CMAX)
       real*8 ixvclo(6,CMAX),jxvclo(6,CMAX)
       character*80 outfile(3),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer j,iflag,nhit,ihit(CMAX),jhit(CMAX),chit(CMAX),nowflag
@@ -4091,9 +4094,9 @@ c Estimate suitable sequence size for the next call to subroutine (Eqs. 15, 16)
       do k = 4, nv
         temp = max( temp, abs( b(7,k) ) )
       end do
-      temp = temp / (72.d0 * abs(t)**7)
+      temp = temp / (72.d0 * abs(t)**7d0)
       tdid = t
-      if (temp.eq.0) then
+      if (temp.eq.0d0) then
         t = tdid * 1.4d0
       else
         t = sign( (tol/temp)**(1.d0/9.d0), tdid )
@@ -4101,7 +4104,7 @@ c Estimate suitable sequence size for the next call to subroutine (Eqs. 15, 16)
 c
 c If sequence size for the first subroutine call is too big, go back and redo
 c the sequence using a smaller size.
-      if (dtflag.eq.1.and.abs(t/tdid).lt.1) then
+      if (dtflag.eq.1.and.abs(t/tdid).lt.1d0) then
         t = t * .8d0
         goto 100
       end if
@@ -4394,7 +4397,7 @@ c
           if (s2.ge.rc2) then
             s_1 = 1.d0 / sqrt(s2)
             tmp2 = s_1 * s_1 * s_1
-          else if (s2.le.0.01*rc2) then
+          else if (s2.le.0.01d0*rc2) then
             tmp2 = 0.d0
           else
             s_1 = 1.d0 / sqrt(s2)
@@ -4531,7 +4534,7 @@ c
         if (s2.lt.rc2) then
           s_1 = 1.d0 / sqrt(s2)
           s_3 = s_1 * s_1 * s_1
-          if (s2.le.0.01*rc2) then
+          if (s2.le.0.01d0*rc2) then
             tmp2 = s_3
           else
             s = 1.d0 / s_1
@@ -5096,7 +5099,7 @@ c Input/Output
       real*8 time,tstart,rcen,rmax,m(nbod),tclo(nclo),dclo(nclo)
       real*8 ixvclo(6,nclo),jxvclo(6,nclo)
       character*80 outfile(3),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer k,year,month
@@ -5217,10 +5220,10 @@ c Input/Output
       real*8 jcen(3),rcen,cefac,m(nbod),x(3,nbod),v(3,nbod)
       real*8 s(3,nbod),rho(nbod),rceh(nbod),ngf(4,nbod),epoch(nbod)
       character*80 dumpfile(4),mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
-      integer idp,i,j,k,len,j1,j2
+      integer idp,i,j,k,len1,j1,j2
       real*8 rhocgs,k_2,rcen_2,rcen_4,rcen_6,x0(3,NMAX),v0(3,NMAX)
       character*150 c
 c
@@ -5266,26 +5269,26 @@ c Write header lines, data style (and epoch for Big bodies)
 c
 c For each body...
           do j = j1, j2
-            len = 37
-            c(1:8) = id(j)
-            write (c(9:37),'(1p,a3,e11.5,a3,e11.5)') ' r=',rceh(j),
+            len1 = 54
+            c(1:25) = id(j)
+            write (c(26:54),'(1p,a3,e11.5,a3,e11.5)') ' r=',rceh(j),
      %        ' d=',rho(j)/rhocgs
-            if (m(j).gt.0) then
-              write (c(len+1:len+25),'(a3,e22.15)') ' m=',m(j)*k_2
-              len = len + 25
+            if (m (j).gt.0d0) then
+              write (c(len1+1:len1+25),'(a3,e22.15)') ' m=',m(j)*k_2
+              len1 = len1 + 25
             end if
             do k = 1, 3
-              if (ngf(k,j).ne.0) then
-                write (c(len+1:len+16),'(a2,i1,a1,e12.5)') ' a',k,'=',
+              if (ngf(k,j).ne.0d0) then
+                write (c(len1+1:len1+16),'(a2,i1,a1,e12.5)') ' a',k,'=',
      %            ngf(k,j)
-                len = len + 16
+                len1 = len1 + 16
               end if
             end do
-            if (ngf(4,j).ne.0) then
-              write (c(len+1:len+15),'(a3,e12.5)') ' b=',ngf(4,j)
-              len = len + 15
+            if (ngf(4,j).ne.0d0) then
+              write (c(len1+1:len1+15),'(a3,e12.5)') ' b=',ngf(4,j)
+              len1 = len1 + 15
             end if
-            write (31,'(a)') c(1:len)
+            write (31,'(a)') c(1:len1)
             if (algor.eq.11) then
               write (31,312) x0(1,j), x0(2,j), x0(3,j)
               write (31,312) v0(1,j), v0(2,j), v0(3,j)
@@ -5493,14 +5496,14 @@ c Local
 c
 c------------------------------------------------------------------------------
 c
-      if (x.eq.0) then
+      if (x.eq.0d0) then
         y = .5d0
       else
         ax = abs(x)
         ex = int(log10(ax))
-        if (ax.ge.1) ex = ex + 1
+        if (ax.ge.1d0) ex = ex + 1
         y = ax*(10.d0**(-ex))
-        if (y.eq.1) then
+        if (y.eq.1d0) then
           y = y * .1d0
           ex = ex + 1
         end if
@@ -5551,7 +5554,7 @@ c Input/Output
       real*8 en(3),am(3),m(NMAX),x(3,NMAX),v(3,NMAX),s(3,NMAX)
       real*8 rho(NMAX),rceh(NMAX),epoch(NMAX),ngf(4,NMAX),cefac
       character*80 outfile(3),dumpfile(4), mem(NMESS)
-      character*8 id(NMAX)
+      character*25 id(NMAX)
 c
 c Local
       integer j,k,itmp,jtmp,informat,lim(2,10),nsub,year,month,lineno
@@ -5808,7 +5811,7 @@ c
           write (23,'(/,3a)') mem(121)(1:lmem(121)),
      %      mem(122)(1:lmem(122)),string( lim(1,1):lim(2,1) )
         end if
-        id(nbod) = string( lim(1,1):min(7+lim(1,1),lim(2,1)) )
+        id(nbod) = string( lim(1,1):min(24+lim(1,1),lim(2,1)) )
 c Check if another object has the same name
         do k = 1, nbod - 1
           if (id(k).eq.id(nbod)) call mio_err (23,mem(81),lmem(81),
@@ -6071,7 +6074,7 @@ c or whether massive Small bodies have different epochs than Big bodies.
       flag1 = .false.
       flag2 = .false.
       do j = nbig + 1, nbod
-        if (m(j).ne.0) then
+        if (m(j).ne.0d0) then
           if (algor.eq.1) call mio_err (23,mem(81),lmem(81),mem(94),
      %      lmem(94),' ',1,mem(85),lmem(85))
           flag1 = .true.
@@ -6182,8 +6185,8 @@ c
       if (month.gt.2) year = d - 4716
       if (month.le.2) year = d - 4715
 c
-      if (day.gt.32) then
-        day = day - 32
+      if (day.gt.32d0) then
+        day = day - 32d0
         month = month + 1
       end if
 c
@@ -6196,9 +6199,9 @@ c
   50  continue
 c
 c Algorithm for negative Julian day numbers (Duffett-Smith doesn't work)
-      x = jd0 - 2232101.5
+      x = jd0 - 2232101.5d0
       f = x - dint(x)
-      if (f.lt.0) f = f + 1.d0
+      if (f.lt.0d0) f = f + 1.d0
       y = dint(mod(x,1461.d0) + 1461.d0)
       z = dint(mod(y,365.25d0))
       month = int((z + 0.5d0) / 30.61d0)
@@ -6317,10 +6320,10 @@ c Input/Output
       real*8 time,jcen(3),rcen,rmax,m(nbod),xh(3,nbod),vh(3,nbod)
       real*8 s(3,nbod),rho(nbod)
       character*80 outfile
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
-      integer k, len, nchar
+      integer k, len1, nchar
       real*8 rhocgs,k_2,rfac,rcen_2,fr,fv,theta,phi,vtheta,vphi
       character*80 header,c(NMAX)
       character*8 mio_fl2c,mio_re2c
@@ -6339,10 +6342,10 @@ c Create the format list, FOUT, used when outputting the orbital elements
       if (opt(4).eq.1) nchar = 2
       if (opt(4).eq.2) nchar = 4
       if (opt(4).eq.3) nchar = 7
-      len = 3  +  6 * nchar
+      len1 = 3  +  6 * nchar
       fout(1:5) = '(a  )'
-      if (len.lt.10) write (fout(3:3),'(i1)') len
-      if (len.ge.10) write (fout(3:4),'(i2)') len
+      if (len1.lt.10) write (fout(3:3),'(i1)') len1
+      if (len1.ge.10) write (fout(3:4),'(i2)') len1
 c
 c Open the orbital-elements output file
   10  open (21, file=outfile, status='old', access='append', err=10)
@@ -6370,19 +6373,19 @@ c For each object, compress its index number, name, mass, spin components
 c and density (some of these need to be converted to normal units).
         do k = 2, nbod
           c(k)(1:8) = mio_re2c (dble(k - 1), 0.d0, 11239423.99d0)
-          c(k)(4:11) = id(k)
-          c(k)(12:19) = mio_fl2c (m(k) * k_2)
-          c(k)(20:27) = mio_fl2c (s(1,k) * k_2)
-          c(k)(28:35) = mio_fl2c (s(2,k) * k_2)
-          c(k)(36:43) = mio_fl2c (s(3,k) * k_2)
-          c(k)(44:51) = mio_fl2c (rho(k) / rhocgs)
+          c(k)(4:28) = id(k)
+          c(k)(29:36) = mio_fl2c (m(k) * k_2)
+          c(k)(37:44) = mio_fl2c (s(1,k) * k_2)
+          c(k)(45:52) = mio_fl2c (s(2,k) * k_2)
+          c(k)(53:60) = mio_fl2c (s(3,k) * k_2)
+          c(k)(61:68) = mio_fl2c (rho(k) / rhocgs)
         end do
 c
 c Write compressed output to file
         write (21,'(a1,a2,i2,a62,i1)') char(12),'6a',algor,header(1:62),
      %    opt(4)
         do k = 2, nbod
-          write (21,'(a51)') c(k)(1:51)
+          write (21,'(a68)') c(k)(1:68)
         end do
       end if
 c
@@ -6413,7 +6416,7 @@ c
 c Write compressed output to file
       write (21,'(a1,a2,a14)') char(12),'6b',header(1:14)
       do k = 2, nbod
-        write (21,fout) c(k)(1:len)
+        write (21,fout) c(k)(1:len1)
       end do
 c
       close (21)
@@ -6461,11 +6464,11 @@ c
       mio_re2c(1:8) = '        '
       y = (x - xmin) / (xmax - xmin)
 c
-      if (y.ge.1) then
+      if (y.ge.1d0) then
         do j = 1, 8
           mio_re2c(j:j) = char(255)
         end do
-      else if (y.gt.0) then
+      else if (y.gt.0d0) then
         z = y
         do j = 1, 8
           z = mod(z, 1.d0) * 224.d0
@@ -6494,13 +6497,13 @@ c Substrings are those which are separated by spaces or the = symbol.
 c
 c------------------------------------------------------------------------------
 c
-      subroutine mio_spl (len,string,nsub,delimit)
+      subroutine mio_spl (len1,string,nsub,delimit)
 c
       implicit none
 c
 c Input/Output
-      integer len,nsub,delimit(2,100)
-      character*1 string(len)
+      integer len1,nsub,delimit(2,100)
+      character*1 string(len1)
 c
 c Local
       integer j,k
@@ -6515,14 +6518,14 @@ c
 c
 c Find the start of string
   10  j = j + 1
-      if (j.gt.len) goto 99
+      if (j.gt.len1) goto 99
       c = string(j)
       if (c.eq.' '.or.c.eq.'=') goto 10
 c
 c Find the end of string
       k = j
   20  k = k + 1
-      if (k.gt.len) goto 30
+      if (k.gt.len1) goto 30
       c = string(k)
       if (c.ne.' '.and.c.ne.'=') goto 20
 c
@@ -6531,7 +6534,7 @@ c Store details for this string
       delimit(1,nsub) = j
       delimit(2,nsub) = k - 1
 c
-      if (k.lt.len) then
+      if (k.lt.len1) then
         j = k
         goto 10
       end if
@@ -6576,7 +6579,7 @@ c Input/Output
       real*8 time, tstart, rmax, en(3), am(3), jcen(3)
       real*8 m(nbod), x(3,nbod), v(3,nbod), s(3,nbod)
       character*80 outfile, mem(NMESS)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer j, year, month
@@ -6608,18 +6611,18 @@ c Write message to information file
   20      open  (23,file=outfile,status='old',access='append',err=20)
           if (opt(3).eq.1) then
             call mio_jd2y (time,year,month,t1)
-            flost = '(1x,a8,a,i10,1x,i2,1x,f8.5)'
+            flost = '(1x,a25,a,i10,1x,i2,1x,f8.5)'
             write (23,flost) id(j),mem(68)(1:lmem(68)),year,month,t1
           else
             if (opt(3).eq.3) then
               t1 = (time - tstart) / 365.25d0
               tstring = mem(2)
-              flost = '(1x,a8,a,f18.7,a)'
+              flost = '(1x,a25,a,f18.7,a)'
             else
               if (opt(3).eq.0) t1 = time
               if (opt(3).eq.2) t1 = time - tstart
               tstring = mem(1)
-              flost = '(1x,a8,a,f18.5,a)'
+              flost = '(1x,a25,a,f18.5,a)'
             end if
             write (23,flost) id(j),mem(68)(1:lmem(68)),t1,tstring
           end if
@@ -6662,7 +6665,7 @@ c Input/Output
       integer nbod, nbig, nelim, stat(nbod), lmem(NMESS)
       real*8 m(nbod), x(3,nbod), v(3,nbod), s(3,nbod)
       real*8 rho(nbod), rceh(nbod), rcrit(nbod), ngf(4,nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
       character*80 outfile, mem(NMESS)
 c
 c Local
@@ -6788,7 +6791,7 @@ c Potential energy terms due to pairs of bodies
           dy = x(2,k) - x(2,j)
           dz = x(3,k) - x(3,j)
           r2 = dx*dx + dy*dy + dz*dz
-          if (r2.ne.0) tmp = tmp + m(k) / sqrt(r2)
+          if (r2.ne.0d0) tmp = tmp + m(k) / sqrt(r2)
         end do
         pe = pe  -  tmp * m(j)
       end do
@@ -6799,11 +6802,11 @@ c Potential energy terms involving the central body
         dy = x(2,j) - x(2,1)
         dz = x(3,j) - x(3,1)
         r2 = dx*dx + dy*dy + dz*dz
-        if (r2.ne.0) pe = pe  -  m(1) * m(j) / sqrt(r2)
+        if (r2.ne.0d0) pe = pe  -  m(1) * m(j) / sqrt(r2)
       end do
 c
 c Corrections for oblateness
-      if (jcen(1).ne.0.or.jcen(2).ne.0.or.jcen(3).ne.0) then
+      if (jcen(1).ne.0d0.or.jcen(2).ne.0d0.or.jcen(3).ne.0d0) then
         do j = 2, nbod
           r2 = xh(1,j)*xh(1,j) + xh(2,j)*xh(2,j) + xh(3,j)*xh(3,j)
           r_1 = 1.d0 / sqrt(r2)
@@ -6980,14 +6983,14 @@ c Input/Output
       integer nbod,nbig,ngflag,opt(8),stat(nbod)
       real*8 time,tstart,h0,tol,jcen(3),m(nbod),x(3,nbod),v(3,nbod)
       real*8 s(3,nbod),rceh(nbod),rho(nbod),epoch(nbod),ngf(4,nbod)
-      character*8 id(nbod)
+      character*25 id(nbod)
 c
 c Local
       integer j,k,l,nsml,nsofar,indx(NMAX),itemp,jtemp(NMAX)
       integer raflag,nce,ice(NMAX),jce(NMAX)
       real*8 temp,epsml(NMAX),rtemp(NMAX)
       real*8 h,hdid,tsmall,rphys(NMAX),rcrit(NMAX)
-      character*8 ctemp(NMAX)
+      character*25 ctemp(NMAX)
       external mfo_all
 c
 c------------------------------------------------------------------------------
@@ -7146,7 +7149,7 @@ c...  for new coords.
         r0 = sqrt(x0*x0 + y0*y0 + z0*z0)
         v0s = vx0*vx0 + vy0*vy0 + vz0*vz0
         u = x0*vx0 + y0*vy0 + z0*vz0
-        alpha = 2.0*mu/r0 - v0s
+        alpha = 2.d0*mu/r0 - v0s
         
 	if (alpha.gt.0.d0) then
            a = mu/alpha
@@ -7159,18 +7162,18 @@ c...  for new coords.
 	   dt = dm/en
 	   if((dm*dm .gt. 0.16d0) .or. (esq.gt.0.36d0)) goto 100
 
-	   if(esq*dm*dm .lt. 0.0016) then
+	   if(esq*dm*dm .lt. 0.0016d0) then
 
                call drift_kepmd(dm,es,ec,xkep,s,c)
-	       fchk = (xkep - ec*s +es*(1.-c) - dm)
+	       fchk = (xkep - ec*s +es*(1.d0-c) - dm)
 
 	       if(fchk*fchk .gt. DANBYB) then
 		  iflg = 1
 		  return
 	       endif
 
-               fp = 1. - ec*c + es*s
-               f = (a/r0) * (c-1.) + 1.
+               fp = 1.d0 - ec*c + es*s
+               f = (a/r0) * (c-1.d0) + 1.d0
                g = dt + (s-xkep)/en
                fdot = - (a/(r0*fp))*en*s
                gdot = (c-1.)/fp + 1.
@@ -7199,10 +7202,10 @@ c...  for new coords.
 100      call drift_kepu(dt,r0,mu,alpha,u,fp,c1,c2,c3,iflg)
 
          if(iflg .eq.0) then
-           f = 1.0 - (mu/r0)*c2
+           f = 1.d0 - (mu/r0)*c2
            g = dt - mu*c3
            fdot = -(mu/(fp*r0))*c1
-           gdot = 1. - (mu/fp)*c2
+           gdot = 1.d0 - (mu/fp)*c2
 
            x = x0*f + vx0*g
            y = y0*f + vy0*g
@@ -7272,13 +7275,13 @@ c...  excellent approx. to sin and cos of x for small x.
         c = sqrt(1.d0 - s*s)
 
 c...    Compute better value for the root using quartic Newton method
-        f = x - ec*s + es*(1.-c) - dm
+        f = x - ec*s + es*(1.d0-c) - dm
         fp = 1. - ec*c + es*s
         fpp = ec*s + es*c
         fppp = ec*c - es*s
         dx = -f/fp
-        dx = -f/(fp + 0.5*dx*fpp)
-        dx = -f/(fp + 0.5*dx*fpp + 0.16666666666666666*dx*dx*fppp)
+        dx = -f/(fp + 0.5d0*dx*fpp)
+        dx = -f/(fp + 0.5d0*dx*fpp + 0.16666666666666666d0*dx*dx*fppp)
         x = x + dx
      
 c...  excellent approx. to sin and cos of x for small x.
@@ -7436,16 +7439,16 @@ c...  Internals:
 c----
 c...  Executable code 
 
-        if (alpha.gt.0.0) then 
+        if (alpha.gt.0.0d0) then 
 c...       find initial guess for elliptic motion
 
-            if( dt/r0 .le. 0.4)  then
-              s = dt/r0 - (dt*dt*u)/(2.0*r0*r0*r0)
+            if( dt/r0 .le. 0.4d0)  then
+              s = dt/r0 - (dt*dt*u)/(2.d0*r0*r0*r0)
 	      return
             else
               a = mu/alpha
               en = sqrt(mu/(a*a*a))
-              ec = 1.0 - r0/a
+              ec = 1.d0 - r0/a
               es = u/(en*a*a)
               e = sqrt(ec*ec + es*es)
               y = en*dt - es
@@ -7453,7 +7456,7 @@ c
               call mco_sine (y,sy,cy)
 c
               sigma = dsign(1.d0,(es*cy + ec*sy))
-              x = y + sigma*.85*e
+              x = y + sigma*.85d0*e
               s = x/sqrt(alpha)
 	    endif
 
@@ -7519,13 +7522,13 @@ c----
 c...  Executable code 
 
 c...    To get close approch needed to take lots of iterations if alpha<0
-        if(alpha.lt.0.0) then
+        if(alpha.lt.0.0d0) then
            ncmax = NLAG2
         else
            ncmax = NLAG2
         endif
 
-        ln = 5.0
+        ln = 5.0d0
 c...    start laguere's method
         do nc =0,ncmax
            x = s*s*alpha
@@ -7535,9 +7538,9 @@ c...    start laguere's method
            c3 = c3*s*s*s
            f = r0*c1 + u*c2 + mu*c3 - dt
            fp = r0*c0 + u*c1 + mu*c2
-           fpp = (-40.0*alpha + mu)*c1 + u*c0
-           ds = - ln*f/(fp + dsign(1.d0,fp)*sqrt(abs((ln - 1.0)*
-     &       (ln - 1.0)*fp*fp - (ln - 1.0)*ln*f*fpp)))
+           fpp = (-40.0d0*alpha + mu)*c1 + u*c0
+           ds = - ln*f/(fp + dsign(1.d0,fp)*sqrt(abs((ln - 1.d0)*
+     &       (ln - 1.d0)*fp*fp - (ln - 1.d0)*ln*f*fpp)))
            s = s + ds
 
            fdt = f/dt
@@ -7674,13 +7677,13 @@ c----
 c...  Executable code 
 
 	denom = (mu - alpha*r0)/6.d0
-	a2 = 0.5*u/denom
+	a2 = 0.5d0*u/denom
 	a1 = r0/denom
 	a0 =-dt/denom
 
 	q = (a1 - a2*a2/3.d0)/3.d0
-	r = (a1*a2 -3.d0*a0)/6.d0 - (a2**3)/27.d0
-	sq2 = q**3 + r**2
+	r = (a1*a2 -3.d0*a0)/6.d0 - (a2**3d0)/27.d0
+	sq2 = q**3d0 + r**2d0
 
 	if( sq2 .ge. 0.d0) then
 	   sq = sqrt(sq2)
@@ -7701,7 +7704,7 @@ c...  Executable code
 
 	else
 	   iflg = 1
-	   s = 0
+	   s = 0d0
 	endif
 
         return
@@ -7742,7 +7745,7 @@ c----
 c...  Executable code 
 
       n = 0
-      xm = 0.1
+      xm = 0.1d0
       do while(abs(x).ge.xm)
          n = n + 1
          x = x * .25d0
@@ -7763,16 +7766,16 @@ c
      %   + 1.984126984126984d-4*x2  - 8.333333333333333d-3*x
      %   + 1.666666666666667d-1
 c
-      c1 = 1. - x*c3
-      c0 = 1. - x*c2
+      c1 = 1.d0 - x*c3
+      c0 = 1.d0 - x*c2
 c
       if(n.ne.0) then
          do i=n,1,-1
             c3 = (c2 + c0*c3)*.25d0
             c2 = c1*c1*.5d0
             c1 = c0*c1
-            c0 = 2.*c0*c0 - 1.
-            x = x * 4.
+            c0 = 2.d0*c0*c0 - 1.d0
+            x = x * 4.d0
           enddo
        endif
 
@@ -8027,9 +8030,9 @@ c  Begin with a reasonable guess based on solving the cubic for small F
 
 	a = 6.d0*(e-1.d0)/e
 	b = -6.d0*capn/e
-	sq = sqrt(0.25*b*b +a*a*a/27.d0)
-	biga = (-0.5*b + sq)**0.3333333333333333d0
-	bigb = -(+0.5*b + sq)**0.3333333333333333d0
+	sq = sqrt(0.25d0*b*b +a*a*a/27.d0)
+	biga = (-0.5d0*b + sq)**0.3333333333333333d0
+	bigb = -(+0.5d0*b + sq)**0.3333333333333333d0
 	x = biga + bigb
 c	write(6,*) 'cubic = ',x**3 +a*x +b
 	orbel_flon = x
@@ -8114,7 +8117,7 @@ c...  Executable code
 	if (q.lt.1.d-3) then
 	   orbel_zget = q*(1.d0 - (q*q/3.d0)*(1.d0 -q*q))
 	else
-	   x = 0.5d0*(3.d0*q + sqrt(9.d0*(q**2) +4.d0))
+	   x = 0.5d0*(3.d0*q + sqrt(9.d0*(q**2d0) +4.d0))
 	   tmp = x**(1.d0/3.d0)
 	   orbel_zget = tmp - 1.d0/tmp
 	endif
