@@ -7,8 +7,7 @@
  xv.out
 )---------------------------------------------------------------------
  type of elements (central body, barycentric, Jacobi) = Central
-) minimum interval between outputs (days) = 365.2d1
- minimum interval between outputs (days) = 100d1
+ minimum interval between outputs (days) = 365.2d1
  express time in days or years = years
  express time relative to integration start time = yes
 )---------------------------------------------------------------------
@@ -16,5 +15,5 @@
  p13e l13.5e a8.5 e8.6 i8.4 g8.4 n8.4 m13e 
 ) a21.16 x21.16 y21.16 z21.16
 )---------------------------------------------------------------------
-) Which bodies do you not want? (List one per line or leave blank for all bodies)
+) Which bodies do you want? (List one per line or leave blank for all bodies)
 )
