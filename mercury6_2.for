@@ -26,6 +26,16 @@ c pub. Reidel.
 c
 c The Bulirsch-Stoer algorithms are described in W.H.Press et al. (1992)
 c ``Numerical Recipes in Fortran'', pub. Cambridge.
+c
+c texadactyl_20180507.1 Handle warnings in mio_err() calls about character string lengths
+c texadactyl_20180507.2 Handle warnings in mio_spl() calls about argument array bounds too small
+c texadactyl_20180507.3 nnn open(..., err=nnn) is an infinite loop
+c                       If one cannot open a file for output, let the program fail.
+c texadactyl_20180514.1 Once CMAX is exceeded by variable the nclo counter,
+c                       this will cause memory out of bounds errors.
+c texadactyl_20180514.2 Return a nonzero error code to the O/S from mio_err().
+c                       Repeat info.out diagnostic on the operator console.
+c
 c------------------------------------------------------------------------------
 c
 c Variables:
@@ -134,7 +144,9 @@ c Get initial conditions and integration parameters
 c
 c If this is a new integration, integrate all the objects to a common epoch.
       if (opflag.eq.-2) then
-  20    open (23,file=outfile(3),status='old',access='append',err=20)
+c texadactyl_20180507.3
+C 20    open (23,file=outfile(3),status='old',access='append',err=20)
+        open (23,file=outfile(3),status='old',access='append')
         write (23,'(/,a)') mem(55)(1:lmem(55))
         write (*,'(a)') mem(55)(1:lmem(55))
         call mxx_sync (time,tstart,h0,tol,jcen,nbod,nbig,m,xh,vh,s,rho,
@@ -185,8 +197,10 @@ c Do a final data dump
      %  id,ngf,epoch,opt,opflag,dumpfile,mem,lmem)
 c
 c Calculate and record the overall change in energy and ang. momentum
-  50  open  (23, file=outfile(3), status='old', access='append',
-     %  err=50)
+c texadactyl_20180507.3
+c 50  open  (23, file=outfile(3), status='old', access='append',
+c    %  err=50)
+      open  (23, file=outfile(3), status='old', access='append')
       write (23,'(/,a)') mem(57)(1:lmem(57))
       call mxx_en (jcen,nbod,nbig,m,xh,vh,s,en(2),am(2))
 c
@@ -1016,7 +1030,9 @@ c (unless the more massive one is a Small body)
       end if
 c
 c Write message to info file (I=0 implies collision with the central body)
-  10  open (23, file=outfile, status='old', access='append', err=10)
+c texadactyl_20180507.3
+c 10  open (23, file=outfile, status='old', access='append', err=10)
+      open (23, file=outfile, status='old', access='append')
 c
       if (opt(3).eq.1) then
         call mio_jd2y (time,year,month,t1)
@@ -1207,7 +1223,9 @@ c
       end do
 c
 c Write compressed output to file
-  50  open (22, file=outfile, status='old', access='append', err=50)
+c texadactyl_20180507.3
+c 50  open (22, file=outfile, status='old', access='append', err=50)
+      open (22, file=outfile, status='old', access='append')
       write (22,'(a1,a2,i2,a62,i1)') char(12),'6a',algor,header(1:62),
      %  opt(4)
       do j = 2, nbod
@@ -1647,10 +1665,14 @@ c is in progress, store details
      %        .or.(d2min.le.d2hit)) then
               nclo = nclo + 1
               if (nclo.gt.CMAX) then
- 230            open (23,file=outfile,status='old',access='append',
-     %            err=230)
-                write (23,'(/,2a,/,a)') mem(121)(1:lmem(121)),
-     %            mem(132)(1:lmem(132)),mem(82)(1:lmem(82))
+c texadactyl_20180507.3
+c230            open (23,file=outfile,status='old',access='append',
+c    %            err=230)
+                open (23,file=outfile,status='old',access='append')
+c texadactyl_20180514.1
+c               write (23,'(/,2a,/,a)') mem(121)(1:lmem(121)),
+                call mio_err(23, mem(81), lmem(81),
+     %            mem(132), lmem(132), mem(82), lmem(82), ' ', 1)
                 close (23)
               else
                 tclo(nclo) = tmin + time
@@ -5147,7 +5169,9 @@ c
 c
 c If required, output the stored close encounter details
       if (nstored.ge.100.or.ceflush.eq.0) then
-  10    open (22, file=outfile(2), status='old', access='append',err=10)
+c texadactyl_20180507.3
+c 10    open (22, file=outfile(2), status='old', access='append',err=10)
+        open (22, file=outfile(2), status='old', access='append')
         do k = 1, nstored
           write (22,'(a1,a2,a70)') char(12),'6b',c(k)(1:70)
         end do
@@ -5158,7 +5182,9 @@ c
 c If new encounter minima have occurred, decide whether to stop integration
       stopflag = 0
       if (opt(1).eq.1.and.nclo.gt.0) then
-  20    open (23, file=outfile(3), status='old', access='append',err=20)
+c texadactyl_20180507.3
+c 20    open (23, file=outfile(3), status='old', access='append',err=20)
+        open (23, file=outfile(3), status='old', access='append')
 c If time style is Gregorian date then...
         tmp0 = tclo(1)
         if (opt(3).eq.1) then
@@ -5247,9 +5273,13 @@ c Dump data for the Big (i=1) and Small (i=2) bodies
           if (idp.eq.1) then
             if (i.eq.1) c(1:12) = 'big.tmp     '
             if (i.eq.2) c(1:12) = 'small.tmp   '
-  20        open (31, file=c(1:12), status='unknown', err=20)
+c texadactyl_20180507.3
+c 20        open (31, file=c(1:12), status='unknown', err=20)
+            open (31, file=c(1:12), status='unknown')
           else
-  25        open (31, file=dumpfile(i), status='old', err=25)
+c texadactyl_20180507.3
+c 25        open (31, file=dumpfile(i), status='old', err=25)
+            open (31, file=dumpfile(i), status='old')
           end if
 c
 c Write header lines, data style (and epoch for Big bodies)
@@ -5302,8 +5332,11 @@ c For each body...
         end do
 c
 c Dump the integration parameters
-  40    if (idp.eq.1) open (33,file='param.tmp',status='unknown',err=40)
-  45    if (idp.eq.2) open (33, file=dumpfile(3), status='old', err=45)
+c texadactyl_20180507.3
+c 40    if (idp.eq.1) open (33,file='param.tmp',status='unknown',err=40)
+        if (idp.eq.1) open (33,file='param.tmp',status='unknown')
+c 45    if (idp.eq.2) open (33, file=dumpfile(3), status='old', err=45)
+        if (idp.eq.2) open (33, file=dumpfile(3), status='old')
 c
 c Important parameters
         write (33,'(a)') mem(151)(1:lmem(151))
@@ -5400,9 +5433,12 @@ c Infrequently-changed parameters
         close (33)
 c
 c Create new version of the restart file
-  60    if (idp.eq.1) open (35, file='restart.tmp', status='unknown',
-     %    err=60)
-  65    if (idp.eq.2) open (35, file=dumpfile(4), status='old', err=65)
+c texadactyl_20180507.3
+c 60    if (idp.eq.1) open (35, file='restart.tmp', status='unknown',
+c    %    err=60)
+        if (idp.eq.1) open (35, file='restart.tmp', status='unknown')
+c 65    if (idp.eq.2) open (35, file=dumpfile(4), status='old', err=65)
+        if (idp.eq.2) open (35, file=dumpfile(4), status='old')
         write (35,'(1x,i2)') opflag
         write (35,*) en(1) * k_2
         write (35,*) am(1) * k_2
@@ -5441,16 +5477,20 @@ c
 c
 c Input/Output
       integer unit,ls1,ls2,ls3,ls4
-      character*80 s1,s2,s3,s4
+c texadactyl_20180507.1
+c     character*80 s1,s2,s3,s4
+      CHARACTER*(*) s1,s2,s3,s4
 c
 c------------------------------------------------------------------------------
 c
-      write (*,'(/,2a)') ' ERROR: Programme terminated. See information'
-     %  ,' file for details.'
-c
+c texadactyl_20180514.2
       write (unit,'(/,3a,/,2a)') s1(1:ls1),s2(1:ls2),s3(1:ls3),
      %  ' ',s4(1:ls4)
-      stop
+      write (*,'(/,3a,/,2a)') s1(1:ls1),s2(1:ls2),s3(1:ls3),
+     %  ' ',s4(1:ls4)
+      write (*,'(/,2a)') ' Programme terminated. See information'
+     %  ,' file for more details.'
+      call EXIT(86)
 c
 c------------------------------------------------------------------------------
 c
@@ -5557,7 +5597,9 @@ c Input/Output
       character*25 id(NMAX)
 c
 c Local
-      integer j,k,itmp,jtmp,informat,lim(2,10),nsub,year,month,lineno
+c texadactyl_20180507.2
+c     integer j,k,itmp,jtmp,informat,lim(2,10),nsub,year,month,lineno
+      integer j,k,itmp,jtmp,informat,lim(2,100),nsub,year,month,lineno
       real*8 q,a,e,i,p,n,l,temp,tmp2,tmp3,rhocgs,t1,tmp4,tmp5,tmp6
 c      real*8 v0(3,NMAX),x0(3,NMAX)
       logical test,oldflag,flag1,flag2
@@ -5659,14 +5701,18 @@ c Check if information file exists, and append a continuation message
         inquire (file=outfile(3), exist=test)
         if (.not.test) call mio_err (6,mem(81),lmem(81),mem(88),
      %    lmem(88),' ',1,outfile(3),80)
- 320    open(23,file=outfile(3),status='old',access='append',err=320)
+c texadactyl_20180507.3
+c320    open(23,file=outfile(3),status='old',access='append',err=320)
+        open(23,file=outfile(3),status='old',access='append')
       else
 c
 c If new integration, check information file doesn't exist, and then create it
         inquire (file=outfile(3), exist=test)
         if (test) call mio_err (6,mem(81),lmem(81),mem(87),lmem(87),
      %    ' ',1,outfile(3),80)
- 410    open(23, file = outfile(3), status = 'new', err=410)
+c texadactyl_20180507.3
+c410    open(23, file = outfile(3), status = 'new', err=410)
+        open(23, file = outfile(3), status = 'new')
       end if
 c
 c------------------------------------------------------------------------------
@@ -5679,7 +5725,9 @@ c Check if the file containing integration parameters exists, and open it
       inquire (file=filename, exist=test)
       if (.not.test) call mio_err (23,mem(81),lmem(81),mem(88),lmem(88),
      %  ' ',1,filename,80)
-  30  open  (13, file=filename, status='old', err=30)
+c texadactyl_20180507.3
+c 30  open  (13, file=filename, status='old', err=30)
+      open  (13, file=filename, status='old')
 c
 c Read integration parameters
       lineno = 0
@@ -5770,7 +5818,9 @@ c Check if the file containing data for Big bodies exists, and open it
         inquire (file=filename, exist=test)
         if (.not.test) call mio_err (23,mem(81),lmem(81),mem(88),
      %    lmem(88),' ',1,filename,80)
- 110    open (11, file=filename, status='old', err=110)
+c texadactyl_20180507.3
+c110    open (11, file=filename, status='old', err=110)
+        open (11, file=filename, status='old')
 c
 c Read data style
  120    read (11,'(a150)') string
@@ -5805,7 +5855,7 @@ c
 c Determine the name of the object
         nbod = nbod + 1
         if (nbod.gt.NMAX) call mio_err (23,mem(81),lmem(81),mem(90),
-     %    lmem(90),' ',1,mem(82),lmem(82))
+     %      lmem(90),' ',1,mem(82),lmem(82))
 c
         if ((lim(2,1)-lim(1,1)).gt.7) then
           write (23,'(/,3a)') mem(121)(1:lmem(121)),
@@ -5928,7 +5978,9 @@ c
         end if
 c
 c Read in energy and angular momentum variables, and convert to internal units
- 330    open (35, file=dumpfile(4), status='old', err=330)
+c texadactyl_20180507.3
+c330    open (35, file=dumpfile(4), status='old', err=330)
+        open (35, file=dumpfile(4), status='old')
           read (35,*) opflag
           read (35,*) en(1),am(1),en(3),am(3)
           en(1) = en(1) * K2
@@ -6005,7 +6057,9 @@ c Check that element and close-encounter files don't exist, and create them
           inquire (file=outfile(j), exist=test)
           if (test) call mio_err (23,mem(81),lmem(81),mem(87),lmem(87),
      %      ' ',1,outfile(j),80)
- 430      open  (20+j, file=outfile(j), status='new', err=430)
+c texadactyl_20180507.3
+c430      open  (20+j, file=outfile(j), status='new', err=430)
+          open  (20+j, file=outfile(j), status='new')
           close (20+j)
         end do
 c
@@ -6014,7 +6068,9 @@ c Check that dump files don't exist, and then create them
           inquire (file=dumpfile(j), exist=test)
           if (test) call mio_err (23,mem(81),lmem(81),mem(87),lmem(87),
      %      ' ',1,dumpfile(j),80)
- 450      open  (30+j, file=dumpfile(j), status='new', err=450)
+c texadactyl_20180507.3
+c450      open  (30+j, file=dumpfile(j), status='new', err=450)
+          open  (30+j, file=dumpfile(j), status='new')
           close (30+j)
         end do
 c
@@ -6348,7 +6404,9 @@ c Create the format list, FOUT, used when outputting the orbital elements
       if (len1.ge.10) write (fout(3:4),'(i2)') len1
 c
 c Open the orbital-elements output file
-  10  open (21, file=outfile, status='old', access='append', err=10)
+c texadactyl_20180507.3
+c 10  open (21, file=outfile, status='old', access='append', err=10)
+      open (21, file=outfile, status='old', access='append')
 c
 c------------------------------------------------------------------------------
 c
@@ -6608,7 +6666,9 @@ c Flag each object which is ejected, and set its mass to zero
           s(3,j) = 0.d0
 c
 c Write message to information file
-  20      open  (23,file=outfile,status='old',access='append',err=20)
+c texadactyl_20180507.3
+c 20      open  (23,file=outfile,status='old',access='append',err=20)
+          open  (23,file=outfile,status='old',access='append')
           if (opt(3).eq.1) then
             call mio_jd2y (time,year,month,t1)
             flost = '(1x,a25,a,i10,1x,i2,1x,f8.5)'
@@ -6716,7 +6776,9 @@ c Update total number of bodies and number of Big bodies
 c
 c If no massive bodies remain, stop the integration
       if (nbig.lt.1) then
-  10    open (23,file=outfile,status='old',access='append',err=10)
+c texadactyl_20180507.3
+c 10    open (23,file=outfile,status='old',access='append',err=10)
+        open (23,file=outfile,status='old',access='append')
         write (23,'(2a)') mem(81)(1:lmem(81)),mem(124)(1:lmem(124))
         close (23)
         stop
