@@ -11,6 +11,10 @@ c during an integration using Mercury6 or higher.
 c
 c The user specifies the names of the required objects in the file close.in
 c
+c texadactyl_20180507.1 Handle warnings in mio_err() calls about character string lengths
+c texadactyl_20180507.2 Handle warnings in mio_spl() calls about argument array bounds too small
+c texadactyl_20180507.5 Fix mishandling of infile(j) - needs to be filled out with spaces
+c
 c------------------------------------------------------------------------------
 c
       implicit none
@@ -69,7 +73,9 @@ c Make sure all the input files exist
   40    read (10,'(a250)') string
         if (string(1:1).eq.')') goto 40
         call mio_spl (250,string,nsub,lim)
-        infile(j)(1:(lim(2,1)-lim(1,1)+1)) = string(lim(1,1):lim(2,1))
+c texadactyl_20180507.5
+c       infile(j)(1:(lim(2,1)-lim(1,1)+1)) = string(lim(1,1):lim(2,1))
+        infile(j)= string(lim(1,1):lim(2,1))
         inquire (file=infile(j), exist=test)
         if (.not.test) call mio_err (6,mem(81),lmem(81),mem(88),
      %    lmem(88),' ',1,infile(j),80)
@@ -793,7 +799,9 @@ c Input/Output
       character*80 mem(NMESS)
 c
 c Local
-      integer j,k,itmp,nsub,lim(2,4)
+c texadactyl_20180507.2
+c     integer j,k,itmp,nsub,lim(2,4)
+      integer j,k,itmp,nsub,lim(2,100)
       logical test
       character*1 bad(5)
       character*250 filename
@@ -935,7 +943,9 @@ c
 c
 c Input/Output
       integer unit,ls1,ls2,ls3,ls4
-      character*80 s1,s2,s3,s4
+c texadactyl_20180507.1
+c     character*80 s1,s2,s3,s4
+      CHARACTER*(*) s1,s2,s3,s4
 c
 c------------------------------------------------------------------------------
 c

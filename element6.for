@@ -13,6 +13,12 @@ c The user specifies the names of the required objects in the file elements.in
 c See subroutine M_FORMAT for the identities of each element in the EL array
 c e.g. el(1)=a, el(2)=e etc.
 c
+c texadactyl_20180507.1 Handle warnings in mio_err() calls about character string lengths
+c texadactyl_20180507.2 Handle warnings in mio_spl() calls about argument array bounds too small
+c texadactyl_20180507.3 wrong string length in argument to mio_err()
+c texadactyl_20180507.4 debugging statements when debugging = 1
+c texadactyl_20180507.5 Fix mishandling of infile(j) - needs to be filled out with spaces
+c
 c------------------------------------------------------------------------------
 c
       implicit none
@@ -34,12 +40,17 @@ c
       character*5 fin
       character*1 check,style,type,c1
       character*2 c2
+c texadactyl_20180507.4
+      integer debugging
 c
 c------------------------------------------------------------------------------
 c
       allflag = 0
       tprevious = 0.d0
       rhocgs = AU * AU * AU * K2 / MSUN
+
+c texadactyl_20180507.4
+      debugging = 0
 c
 c Read in output messages
       inquire (file='message.in', exist=test)
@@ -59,8 +70,11 @@ c Open file containing parameters for this programme
       if (test) then
         open (10, file='element.in', status='old')
       else
+c call mio_err (6,mem(81),lmem(81),mem(88),lmem(88),' ',1,
         call mio_err (6,mem(81),lmem(81),mem(88),lmem(88),' ',1,
-     %    'element.in',9)
+c texadactyl_20180507.3
+c    %    'element.in',9)
+     %    'element.in',10)
       end if
 c
 c Read number of input files
@@ -74,7 +88,17 @@ c Make sure all the input files exist
   40    read (10,'(a250)') string
         if (string(1:1).eq.')') goto 40
         call mio_spl (250,string,nsub,lim)
-        infile(j)(1:(lim(2,1)-lim(1,1)+1)) = string(lim(1,1):lim(2,1))
+c texadactyl_20180507.5
+c        infile(j)(1:(lim(2,1)-lim(1,1)+1)) = string(lim(1,1):lim(2,1))
+        infile(j) = string(lim(1,1):lim(2,1))
+c texadactyl_20180507.4
+        if (debugging.eq.1) then
+          write (*,'(/,a,i3,a,i3,3a, a, a50, a)')
+     %      ' DEBUG: lim(1,1)=', lim(1,1),
+     %      ', lim(2,1)=', lim(2,1),
+     %      ', [', string(lim(1,1):lim(2,1)), ']',
+     %      ', infile(j)=[', infile(j), ']'
+        end if
         inquire (file=infile(j), exist=test)
         if (.not.test) call mio_err (6,mem(81),lmem(81),mem(88),
      %    lmem(88),' ',1,infile(j),80)
@@ -938,7 +962,9 @@ c Input/Output
       character*80 mem(NMESS)
 c
 c Local
-      integer j,k,itmp,nsub,lim(2,4)
+c texadactyl_20180507.2
+c     integer j,k,itmp,nsub,lim(2,4)
+      integer j,k,itmp,nsub,lim(2,100)
       logical test
       character*1 bad(5)
       character*250 filename
@@ -1080,7 +1106,9 @@ c
 c
 c Input/Output
       integer unit,ls1,ls2,ls3,ls4
-      character*80 s1,s2,s3,s4
+c texadactyl_20180507.1
+c     character*80 s1,s2,s3,s4
+      CHARACTER*(*) s1,s2,s3,s4
 c
 c------------------------------------------------------------------------------
 c
@@ -1768,7 +1796,9 @@ c Input/Output
       character*250 string,header,fout
 c
 c Local
-      integer i,j,pos,nsub,lim(2,20),formflag,lenfout,f1,f2,itmp
+c texadactyl_20180507.2
+c     integer i,j,pos,nsub,lim(2,20),formflag,lenfout,f1,f2,itmp
+      integer i,j,pos,nsub,lim(2,100),formflag,lenfout,f1,f2,itmp
       character*1 elcode(22)
       character*4 elhead(22)
 c
@@ -2132,6 +2162,4 @@ c...  Executable code
 	
 	return
 	end    ! orbel_zget
-c----------------------------------------------------------------------
-
 
