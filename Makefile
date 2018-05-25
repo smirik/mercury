@@ -38,7 +38,7 @@ unbuild:
 # --- Generate input files from samples 
 # --- *.in copied from corresponding *.in.sample
 gen-in:
-	for FILE in *.sample; do \
+	for FILE in $(EXEC)/*.sample; do \
 		cp $$FILE `echo $$FILE | sed 's/.sample//g'`; \
 	done
 
