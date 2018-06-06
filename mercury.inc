@@ -23,6 +23,9 @@ c
       parameter (HUGE = 9.9d29)
       parameter (NFILES = 50)
 c
+C idovgalyov: dump block key (0 or 1)
+      integer DUMP_BLOCK
+      parameter (DUMP_BLOCK = 1)
 c------------------------------------------------------------------------------
 c
 c Constants:

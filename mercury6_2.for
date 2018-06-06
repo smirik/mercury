@@ -157,6 +157,9 @@ C 20    open (23,file=outfile(3),status='old',access='append',err=20)
         close (23)
       end if
 c
+C idovgalyov - time measurment
+      open(138, file='dumptime.log', status='replace')
+      open(139, file='mio_dump_time.log', status='replace')
 c Main integration
       if (algor.eq.1) call mal_hcon (time,tstart,tstop,dtout,algor,h0,
      %  tol,jcen,rcen,rmax,en,am,cefac,ndump,nfun,nbod,nbig,m,xh,vh,s,
@@ -192,9 +195,12 @@ c Do a final data dump
       do j = 2, nbod
         epoch(j) = time
       end do
+C idovgalyov: added dump block
+      if (DUMP_BLOCK.eq.0) then
       call mio_dump (time,tstart,tstop,dtout,algor,h0,tol,jcen,rcen,
      %  rmax,en,am,cefac,ndump,nfun,nbod,nbig,m,xh,vh,s,rho,rceh,stat,
      %  id,ngf,epoch,opt,opflag,dumpfile,mem,lmem)
+      end if
 c
 c Calculate and record the overall change in energy and ang. momentum
 c texadactyl_20180507.3
@@ -214,6 +220,9 @@ c
       write (*,'(a)') mem(57)(1:lmem(57))
 c
 c------------------------------------------------------------------------------
+C idovgalyov - time measurment
+        close(138)
+        close(139)
 c
  231  format (/,a,1p1e12.5)
  232  format (a,1p1e12.5)
@@ -307,6 +316,9 @@ c Local
       real*8 dclo(CMAX),tclo(CMAX),epoch(NMAX)
       real*8 ixvclo(6,CMAX),jxvclo(6,CMAX)
       external mfo_all,onestep
+
+C idovgalyov - time measurment
+      real*8 bneck_start, bneck_end, bneck(4)
 c
 c------------------------------------------------------------------------------
 c
@@ -337,6 +349,7 @@ c Set up time of next output, times of previous dump, log and periodic effect
       tdump = time
       tfun  = time
       tlog  = time
+
 c
 c------------------------------------------------------------------------------
 c
@@ -346,6 +359,8 @@ c
 c
 c Is it time for output ?
       if (abs(tout-time).lt.abs(tsmall).and.opflag.ge.-1) then
+C idovgalyov - time measurment
+        call CPU_TIME(bneck_start)
 c
 c Beware: the integration may change direction at this point!!!!
         if (opflag.eq.-1) dtflag = 0
@@ -353,24 +368,44 @@ c
 c Output data for all bodies
         call mio_out (time,jcen,rcen,rmax,nbod,nbig,m,xh,vh,s,rho,
      %    stat,id,opt,opflag,algor,outfile(1))
+C idovgalyov - time measurment
+        call CPU_TIME(bneck(1))
         call mio_ce (time,tstart,rcen,rmax,nbod,nbig,m,stat,id,
      %    0,iclo,jclo,opt,stopflag,tclo,dclo,ixvclo,jxvclo,mem,lmem,
      %    outfile,nstored,0)
+C idovgalyov - time measurment
+        call CPU_TIME(bneck(2))
         tmp0 = tstop - tout
         tout = tout + sign( min( abs(tmp0), abs(dtout) ), tmp0 )
+C idovgalyov - time measurment
+        call CPU_TIME(bneck(3))
 c
 c Update the data dump files
         do j = 2, nbod
           epoch(j) = time
         end do
+C idovgalyov: added dump block
+        if (DUMP_BLOCK.eq.0) then
         call mio_dump (time,tstart,tstop,dtout,algor,h,tol,jcen,rcen,
      %    rmax,en,am,cefac,ndump,nfun,nbod,nbig,m,xh,vh,s,rho,rceh,stat,
      %    id,ngf,epoch,opt,opflag,dumpfile,mem,lmem)
+        end if
         tdump = time
+C idovgalyov - time measurment
+        call CPU_TIME(bneck(4))
+        call CPU_TIME(bneck_end)
+        do j = 4, 2, -1
+          bneck(j) = bneck(j) - bneck(j-1)
+        end do
+        bneck(1) = bneck(1) - bneck_start
+        write(138,'(4f10.6, f10.6)') bneck, bneck_end - bneck_start
       end if
 c
+C idovgalyov - time measurment
 c If integration has finished return to the main part of programme
-      if (abs(tstop-time).le.abs(tsmall).and.opflag.ne.-1) return
+      if (abs(tstop-time).le.abs(tsmall).and.opflag.ne.-1) then
+        return
+      end if
 c
 c Set the timestep
       if (opflag.eq.-1) tmp0 = tstart - time
@@ -468,9 +503,12 @@ c Do the data dump
         call mio_ce (time,tstart,rcen,rmax,nbod,nbig,m,stat,id,
      %    0,iclo,jclo,opt,stopflag,tclo,dclo,ixvclo,jxvclo,mem,lmem,
      %    outfile,nstored,0)
+C idovgalyov: added dump block
+        if (DUMP_BLOCK.eq.0) then
         call mio_dump (time,tstart,tstop,dtout,algor,h,tol,jcen,rcen,
      %    rmax,en,am,cefac,ndump,nfun,nbod,nbig,m,xh,vh,s,rho,rceh,stat,
      %    id,ngf,epoch,opt,opflag,dumpfile,mem,lmem)
+        end if
         tdump = time
       end if
 c
@@ -5252,6 +5290,8 @@ c Local
       integer idp,i,j,k,len1,j1,j2
       real*8 rhocgs,k_2,rcen_2,rcen_4,rcen_6,x0(3,NMAX),v0(3,NMAX)
       character*150 c
+C idovgalyov - time measurment
+      real*8 t139(100)
 c
 c------------------------------------------------------------------------------
 c
@@ -5268,6 +5308,8 @@ c
 c Dump to temporary files (idp=1) and real dump files (idp=2)
       do idp = 1, 2
 c
+C idovgalyov - time measurment
+        call CPU_TIME(t139(1))
 c Dump data for the Big (i=1) and Small (i=2) bodies
         do i = 1, 2
           if (idp.eq.1) then
@@ -5331,6 +5373,8 @@ c For each body...
           close (31)
         end do
 c
+C idovgalyov - time measurment
+        call CPU_TIME(t139(2))
 c Dump the integration parameters
 c texadactyl_20180507.3
 c 40    if (idp.eq.1) open (33,file='param.tmp',status='unknown',err=40)
@@ -5338,6 +5382,8 @@ c 40    if (idp.eq.1) open (33,file='param.tmp',status='unknown',err=40)
 c 45    if (idp.eq.2) open (33, file=dumpfile(3), status='old', err=45)
         if (idp.eq.2) open (33, file=dumpfile(3), status='old')
 c
+C idovgalyov - time measurment
+        call CPU_TIME(t139(3))
 c Important parameters
         write (33,'(a)') mem(151)(1:lmem(151))
         write (33,'(a)') mem(154)(1:lmem(154))
@@ -5367,6 +5413,8 @@ c Important parameters
         write (33,*) mem(163)(1:lmem(163)),h0
         write (33,*) mem(164)(1:lmem(164)),tol
 c
+C idovgalyov - time measurment
+        call CPU_TIME(t139(4))
 c Integration options
         write (33,'(a)') mem(155)(1:lmem(155))
         write (33,'(a)') mem(165)(1:lmem(165))
@@ -5415,6 +5463,8 @@ c Integration options
           write (33,'(2a)') mem(174)(1:lmem(174)),mem(5)(1:lmem(5))
         end if
 c
+C idovgalyov - time measurment
+        call CPU_TIME(t139(5))
 c Infrequently-changed parameters
         write (33,'(a)') mem(155)(1:lmem(155))
         write (33,'(a)') mem(175)(1:lmem(175))
@@ -5432,6 +5482,8 @@ c Infrequently-changed parameters
         write (33,*) mem(186)(1:lmem(186)),nfun
         close (33)
 c
+C idovgalyov - time measurment
+        call CPU_TIME(t139(6))
 c Create new version of the restart file
 c texadactyl_20180507.3
 c 60    if (idp.eq.1) open (35, file='restart.tmp', status='unknown',
@@ -5439,6 +5491,8 @@ c    %    err=60)
         if (idp.eq.1) open (35, file='restart.tmp', status='unknown')
 c 65    if (idp.eq.2) open (35, file=dumpfile(4), status='old', err=65)
         if (idp.eq.2) open (35, file=dumpfile(4), status='old')
+C idovgalyov - time measurment
+        call CPU_TIME(t139(7))
         write (35,'(1x,i2)') opflag
         write (35,*) en(1) * k_2
         write (35,*) am(1) * k_2
@@ -5448,6 +5502,13 @@ c 65    if (idp.eq.2) open (35, file=dumpfile(4), status='old', err=65)
         write (35,*) s(2,1) * k_2
         write (35,*) s(3,1) * k_2
         close (35)
+C idovgalyov - time measurment
+        call CPU_TIME(t139(8))
+        call CPU_TIME(t139(9))
+        do i = 8, 2, -1
+          t139(i) = t139(i) - t139(i - 1)
+        end do
+        write(139, '(8f10.6)') t139(2:8), t139(9) - t139(1)
       end do
 c
 c------------------------------------------------------------------------------
