@@ -158,8 +158,13 @@ C 20    open (23,file=outfile(3),status='old',access='append',err=20)
       end if
 c
 C idovgalyov - time measurment
-      open(138, file='dumptime.log', status='replace')
-      open(139, file='mio_dump_time.log', status='replace')
+C      open(138, file='dumptime.log', status='replace')
+C      open(139, file='mio_dump_time.log', status='replace')
+C idovgalyov: move file opening from MIO_OUT
+      open (21, file=outfile(1), status='old', access='append')
+C idovgalyov: move file opening from MIO_CE
+      open (22, file=outfile(2), status='old', access='append')
+      open (23, file=outfile(3), status='old', access='append')
 c Main integration
       if (algor.eq.1) call mal_hcon (time,tstart,tstop,dtout,algor,h0,
      %  tol,jcen,rcen,rmax,en,am,cefac,ndump,nfun,nbod,nbig,m,xh,vh,s,
@@ -191,6 +196,11 @@ c
      %  rho,rceh,stat,id,ngf,opt,opflag,ngflag,outfile,dumpfile,mem,
      %  lmem,mdt_hy,mco_h2dh,mco_dh2h)
 c
+C idovgalyov: move file opening from MIO_OUT
+      close(21)
+C idovgalyov: move file opening from MIO_CE
+      close(22)
+      close(23)
 c Do a final data dump
       do j = 2, nbod
         epoch(j) = time
@@ -221,8 +231,8 @@ c
 c
 c------------------------------------------------------------------------------
 C idovgalyov - time measurment
-        close(138)
-        close(139)
+C        close(138)
+C        close(139)
 c
  231  format (/,a,1p1e12.5)
  232  format (a,1p1e12.5)
@@ -318,7 +328,8 @@ c Local
       external mfo_all,onestep
 
 C idovgalyov - time measurment
-      real*8 bneck_start, bneck_end, bneck(4)
+C      real*8 bneck_start, bneck_end, bneck(4)
+      write(*,*) 'MAL_HVAR'
 c
 c------------------------------------------------------------------------------
 c
@@ -360,7 +371,7 @@ c
 c Is it time for output ?
       if (abs(tout-time).lt.abs(tsmall).and.opflag.ge.-1) then
 C idovgalyov - time measurment
-        call CPU_TIME(bneck_start)
+C        call CPU_TIME(bneck_start)
 c
 c Beware: the integration may change direction at this point!!!!
         if (opflag.eq.-1) dtflag = 0
@@ -369,16 +380,16 @@ c Output data for all bodies
         call mio_out (time,jcen,rcen,rmax,nbod,nbig,m,xh,vh,s,rho,
      %    stat,id,opt,opflag,algor,outfile(1))
 C idovgalyov - time measurment
-        call CPU_TIME(bneck(1))
+C        call CPU_TIME(bneck(1))
         call mio_ce (time,tstart,rcen,rmax,nbod,nbig,m,stat,id,
      %    0,iclo,jclo,opt,stopflag,tclo,dclo,ixvclo,jxvclo,mem,lmem,
      %    outfile,nstored,0)
 C idovgalyov - time measurment
-        call CPU_TIME(bneck(2))
+C        call CPU_TIME(bneck(2))
         tmp0 = tstop - tout
         tout = tout + sign( min( abs(tmp0), abs(dtout) ), tmp0 )
 C idovgalyov - time measurment
-        call CPU_TIME(bneck(3))
+C        call CPU_TIME(bneck(3))
 c
 c Update the data dump files
         do j = 2, nbod
@@ -392,13 +403,13 @@ C idovgalyov: added dump block
         end if
         tdump = time
 C idovgalyov - time measurment
-        call CPU_TIME(bneck(4))
-        call CPU_TIME(bneck_end)
-        do j = 4, 2, -1
-          bneck(j) = bneck(j) - bneck(j-1)
-        end do
-        bneck(1) = bneck(1) - bneck_start
-        write(138,'(4f10.6, f10.6)') bneck, bneck_end - bneck_start
+C        call CPU_TIME(bneck(4))
+C        call CPU_TIME(bneck_end)
+C        do j = 4, 2, -1
+C          bneck(j) = bneck(j) - bneck(j-1)
+C        end do
+C        bneck(1) = bneck(1) - bneck_start
+C        write(138,'(4f10.6, f10.6)') bneck, bneck_end - bneck_start
       end if
 c
 C idovgalyov - time measurment
@@ -1070,7 +1081,8 @@ c
 c Write message to info file (I=0 implies collision with the central body)
 c texadactyl_20180507.3
 c 10  open (23, file=outfile, status='old', access='append', err=10)
-      open (23, file=outfile, status='old', access='append')
+C idovgalyov: move file opening from MIO_CE
+C      open (23, file=outfile, status='old', access='append')
 c
       if (opt(3).eq.1) then
         call mio_jd2y (time,year,month,t1)
@@ -1102,7 +1114,8 @@ c
      %      mem(71)(1:lmem(71)),t1,tstring
         end if
       end if
-      close (23)
+C idovgalyov: move file opening from MIO_CE
+C      close (23)
 c
 c Do the collision (inelastic merger)
       call mce_merg (jcen,i,j,nbod,nbig,m,xh,vh,s,stat,elost)
@@ -1263,13 +1276,15 @@ c
 c Write compressed output to file
 c texadactyl_20180507.3
 c 50  open (22, file=outfile, status='old', access='append', err=50)
-      open (22, file=outfile, status='old', access='append')
+C idovgalyov: move file opening from MIO_CE
+C      open (22, file=outfile, status='old', access='append')
       write (22,'(a1,a2,i2,a62,i1)') char(12),'6a',algor,header(1:62),
      %  opt(4)
       do j = 2, nbod
         write (22,'(a68)') c(j)(1:68)
       end do
-      close (22)
+C idovgalyov: move file opening from MIO_CE
+C      close (22)
 c
 c------------------------------------------------------------------------------
 c
@@ -1706,12 +1721,14 @@ c is in progress, store details
 c texadactyl_20180507.3
 c230            open (23,file=outfile,status='old',access='append',
 c    %            err=230)
-                open (23,file=outfile,status='old',access='append')
+C idovgalyov: move file opening from MIO_CE
+C                open (23,file=outfile,status='old',access='append')
 c texadactyl_20180514.1
 c               write (23,'(/,2a,/,a)') mem(121)(1:lmem(121)),
                 call mio_err(23, mem(81), lmem(81),
      %            mem(132), lmem(132), mem(82), lmem(82), ' ', 1)
-                close (23)
+C idovgalyov: move file opening from MIO_CE
+C                close (23)
               else
                 tclo(nclo) = tmin + time
                 dclo(nclo) = sqrt (max(0.d0,d2min))
@@ -5209,11 +5226,13 @@ c If required, output the stored close encounter details
       if (nstored.ge.100.or.ceflush.eq.0) then
 c texadactyl_20180507.3
 c 10    open (22, file=outfile(2), status='old', access='append',err=10)
-        open (22, file=outfile(2), status='old', access='append')
+C idovgalyov: move file opening from MIO_CE
+C        open (22, file=outfile(2), status='old', access='append')
         do k = 1, nstored
           write (22,'(a1,a2,a70)') char(12),'6b',c(k)(1:70)
         end do
-        close (22)
+C idovgalyov: move file opening from MIO_CE
+C        close (22)
         nstored = 0
       end if
 c
@@ -5222,7 +5241,8 @@ c If new encounter minima have occurred, decide whether to stop integration
       if (opt(1).eq.1.and.nclo.gt.0) then
 c texadactyl_20180507.3
 c 20    open (23, file=outfile(3), status='old', access='append',err=20)
-        open (23, file=outfile(3), status='old', access='append')
+C idovgalyov: move file opening from MIO_CE
+C        open (23, file=outfile(3), status='old', access='append')
 c If time style is Gregorian date then...
         tmp0 = tclo(1)
         if (opt(3).eq.1) then
@@ -5248,7 +5268,8 @@ c Otherwise...
      %      mem(71)(1:lmem(71)),t1,tstring
         end if
         stopflag = 1
-        close(23)
+C idovgalyov: move file opening from MIO_CE
+C        close (23)
       end if
 c
 c------------------------------------------------------------------------------
@@ -5291,7 +5312,7 @@ c Local
       real*8 rhocgs,k_2,rcen_2,rcen_4,rcen_6,x0(3,NMAX),v0(3,NMAX)
       character*150 c
 C idovgalyov - time measurment
-      real*8 t139(100)
+C      real*8 t139(100)
 c
 c------------------------------------------------------------------------------
 c
@@ -5309,7 +5330,7 @@ c Dump to temporary files (idp=1) and real dump files (idp=2)
       do idp = 1, 2
 c
 C idovgalyov - time measurment
-        call CPU_TIME(t139(1))
+C        call CPU_TIME(t139(1))
 c Dump data for the Big (i=1) and Small (i=2) bodies
         do i = 1, 2
           if (idp.eq.1) then
@@ -5374,7 +5395,7 @@ c For each body...
         end do
 c
 C idovgalyov - time measurment
-        call CPU_TIME(t139(2))
+C        call CPU_TIME(t139(2))
 c Dump the integration parameters
 c texadactyl_20180507.3
 c 40    if (idp.eq.1) open (33,file='param.tmp',status='unknown',err=40)
@@ -5383,7 +5404,7 @@ c 45    if (idp.eq.2) open (33, file=dumpfile(3), status='old', err=45)
         if (idp.eq.2) open (33, file=dumpfile(3), status='old')
 c
 C idovgalyov - time measurment
-        call CPU_TIME(t139(3))
+C        call CPU_TIME(t139(3))
 c Important parameters
         write (33,'(a)') mem(151)(1:lmem(151))
         write (33,'(a)') mem(154)(1:lmem(154))
@@ -5414,7 +5435,7 @@ c Important parameters
         write (33,*) mem(164)(1:lmem(164)),tol
 c
 C idovgalyov - time measurment
-        call CPU_TIME(t139(4))
+C        call CPU_TIME(t139(4))
 c Integration options
         write (33,'(a)') mem(155)(1:lmem(155))
         write (33,'(a)') mem(165)(1:lmem(165))
@@ -5464,7 +5485,7 @@ c Integration options
         end if
 c
 C idovgalyov - time measurment
-        call CPU_TIME(t139(5))
+C        call CPU_TIME(t139(5))
 c Infrequently-changed parameters
         write (33,'(a)') mem(155)(1:lmem(155))
         write (33,'(a)') mem(175)(1:lmem(175))
@@ -5483,7 +5504,7 @@ c Infrequently-changed parameters
         close (33)
 c
 C idovgalyov - time measurment
-        call CPU_TIME(t139(6))
+C        call CPU_TIME(t139(6))
 c Create new version of the restart file
 c texadactyl_20180507.3
 c 60    if (idp.eq.1) open (35, file='restart.tmp', status='unknown',
@@ -5492,7 +5513,7 @@ c    %    err=60)
 c 65    if (idp.eq.2) open (35, file=dumpfile(4), status='old', err=65)
         if (idp.eq.2) open (35, file=dumpfile(4), status='old')
 C idovgalyov - time measurment
-        call CPU_TIME(t139(7))
+C        call CPU_TIME(t139(7))
         write (35,'(1x,i2)') opflag
         write (35,*) en(1) * k_2
         write (35,*) am(1) * k_2
@@ -5503,12 +5524,12 @@ C idovgalyov - time measurment
         write (35,*) s(3,1) * k_2
         close (35)
 C idovgalyov - time measurment
-        call CPU_TIME(t139(8))
-        call CPU_TIME(t139(9))
-        do i = 8, 2, -1
-          t139(i) = t139(i) - t139(i - 1)
-        end do
-        write(139, '(8f10.6)') t139(2:8), t139(9) - t139(1)
+C        call CPU_TIME(t139(8))
+C        call CPU_TIME(t139(9))
+C        do i = 8, 2, -1
+C          t139(i) = t139(i) - t139(i - 1)
+C        end do
+C        write(139, '(8f10.6)') t139(2:8), t139(9) - t139(1)
       end do
 c
 c------------------------------------------------------------------------------
@@ -5763,8 +5784,8 @@ c Check if information file exists, and append a continuation message
         if (.not.test) call mio_err (6,mem(81),lmem(81),mem(88),
      %    lmem(88),' ',1,outfile(3),80)
 c texadactyl_20180507.3
-c320    open(23,file=outfile(3),status='old',access='append',err=320)
-        open(23,file=outfile(3),status='old',access='append')
+c320    open (23,file=outfile(3),status='old',access='append',err=320)
+        open (23,file=outfile(3),status='old',access='append')
       else
 c
 c If new integration, check information file doesn't exist, and then create it
@@ -5772,8 +5793,8 @@ c If new integration, check information file doesn't exist, and then create it
         if (test) call mio_err (6,mem(81),lmem(81),mem(87),lmem(87),
      %    ' ',1,outfile(3),80)
 c texadactyl_20180507.3
-c410    open(23, file = outfile(3), status = 'new', err=410)
-        open(23, file = outfile(3), status = 'new')
+c410    open (23, file = outfile(3), status = 'new', err=410)
+        open (23, file = outfile(3), status = 'new')
       end if
 c
 c------------------------------------------------------------------------------
@@ -6436,6 +6457,7 @@ c Input/Output
       integer nbod, nbig, stat(nbod), opt(8), opflag, algor
       real*8 time,jcen(3),rcen,rmax,m(nbod),xh(3,nbod),vh(3,nbod)
       real*8 s(3,nbod),rho(nbod)
+C idovgalyov: move file opening out of main loop
       character*80 outfile
       character*25 id(nbod)
 c
@@ -6467,7 +6489,8 @@ c
 c Open the orbital-elements output file
 c texadactyl_20180507.3
 c 10  open (21, file=outfile, status='old', access='append', err=10)
-      open (21, file=outfile, status='old', access='append')
+C idovgalyov: move file opening out of main loop
+C      open (21, file=outfile, status='old', access='append')
 c
 c------------------------------------------------------------------------------
 c
@@ -6538,7 +6561,8 @@ c Write compressed output to file
         write (21,fout) c(k)(1:len1)
       end do
 c
-      close (21)
+C idovgalyov: move file opening out of main loop
+C      close (21)
       opflag = 0
 c
 c------------------------------------------------------------------------------
@@ -6729,7 +6753,8 @@ c
 c Write message to information file
 c texadactyl_20180507.3
 c 20      open  (23,file=outfile,status='old',access='append',err=20)
-          open  (23,file=outfile,status='old',access='append')
+C idovgalyov: move file opening from MIO_CE
+C          open  (23,file=outfile,status='old',access='append')
           if (opt(3).eq.1) then
             call mio_jd2y (time,year,month,t1)
             flost = '(1x,a25,a,i10,1x,i2,1x,f8.5)'
@@ -6747,7 +6772,8 @@ c 20      open  (23,file=outfile,status='old',access='append',err=20)
             end if
             write (23,flost) id(j),mem(68)(1:lmem(68)),t1,tstring
           end if
-          close (23)
+C idovgalyov: move file opening from MIO_CE
+C          close (23)
         end if
       end do
 c
@@ -6839,9 +6865,11 @@ c If no massive bodies remain, stop the integration
       if (nbig.lt.1) then
 c texadactyl_20180507.3
 c 10    open (23,file=outfile,status='old',access='append',err=10)
-        open (23,file=outfile,status='old',access='append')
+C idovgalyov: move file opening from MIO_CE
+C        open (23,file=outfile,status='old',access='append')
         write (23,'(2a)') mem(81)(1:lmem(81)),mem(124)(1:lmem(124))
-        close (23)
+C idovgalyov: move file opening from MIO_CE
+C        close (23)
         stop
       end if
 c
