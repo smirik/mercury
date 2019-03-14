@@ -4,8 +4,8 @@
 ) Important integration parameters:
 )---------------------------------------------------------------------
  algorithm (MVS, BS, BS2, RADAU, HYBRID etc) = bs
- start time (days)= 2457600.5d0
- stop time (days) = 38982600.5d0
+ start time (days)= 2458400.5d0
+ stop time (days) = 3000000.5d0
  output interval (days) = 3652.5d0
  timestep (days) = 8d0
  accuracy parameter=1.d-12
