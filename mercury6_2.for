@@ -960,7 +960,18 @@ c Time of impact relative to the end of the timestep
             if (e.lt.1d0) then
               a = q / (1.d0 - e)
               uhit = sign (acos((1.d0 - rcen/a)/e), -h)
-              u0   = sign (acos((1.d0 - r0/a  )/e), rv0)
+c Avoid invalid acos calls (due to previous rounding errors) by checking input
+c             u0   = sign (acos((1.d0 - r0/a  )/e), rv0)
+              temp = (1.d0 - r0/a)/e
+              if (temp.ge.1d0) then
+                u0 = 0.d0
+              else
+                if (temp.le.-1d0) then
+                  u0 = sign(PI, rv0)
+                else
+                  u0 = sign(acos(temp), rv0)
+                end if
+              end if
               mhit = mod (uhit - e*sin(uhit) + PI, TWOPI) - PI
               m0   = mod (u0   - e*sin(u0)   + PI, TWOPI) - PI
             else
