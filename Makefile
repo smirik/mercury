@@ -2,7 +2,7 @@
 #
 # --- constants
 FORTRAN=gfortran
-FFLAGS=-g -O2 -Wline-truncation -Wsurprising -Werror
+FFLAGS=-g -O2 -Wline-truncation -Wsurprising -Werror -ffpe-trap=invalid,zero,overflow
 BIN=.
 EXEC=.
 SRC=.
