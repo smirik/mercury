@@ -52,20 +52,20 @@ are required to convert mercury6 output into a readable format.
 **element6**
 
 This programme converts the mercury6 output file into
-a set of files (*.out) containing Keplerian orbital elements for each of the
+a set of binary files (*.out) containing Keplerian orbital elements for each of the
 objects of the integration. These files allow you to see how the orbit of each object
 change with time, thus can be used as the basis for making
-graphs or movies using a graphics/video package.  
+graphs or movies using a graphics/video package.  Sorry, but 
 
-The sample input files will yield ```element6``` output files (*.aei) for Earth, Apollo, and Apophis.
+The sample input files will yield text-format ```element6``` output files (*.aei) for Earth, Apollo, and Apophis.
 
-The resultant ```element.out``` file for the sample input files contains a summary of features for 
+The resultant ```element.out``` file for the sample input files contains a text-format summary of features for 
 the Solar System planets, Apollo, and Apophis.
 
 **close6**
 
 This programme converts the mercury6 output file 
-into a set of files (*.clo) containing details of close encounters between
+into a set of files (*.clo) containing text-format details of close encounters between
 objects during the integration.
 
 The sample input files will yield ```close6``` output for the Solar System planets, Apollo, and Apophis.
@@ -80,3 +80,20 @@ The sample input files will yield ```close6``` output for the Solar System plane
 - make clean   : Remove all input files, generated files, and the executables
 
 ```
+### Fortran Include Files
+
+#### mercury.inc
+
+This contains constants and general parameters used by programmes in
+the mercury package. 
+
+CAUTION: Make sure that you understand the implications of changing any of the parameter values.
+
+#### swift.inc
+
+This contains constants and parameters used in the subroutines written
+by H.Levison and M.Duncan (1994, Icarus, vol 108, pp18). These
+subroutines have names that begin with either `drift' or `orbel'.
+
+CAUTION: Make sure that you understand the implications of changing any of the parameter values.
+
