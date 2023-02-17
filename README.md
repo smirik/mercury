@@ -7,14 +7,14 @@ Currently, this Gnu Fortran github project is configured for Linux and Mac OS X 
 *How to Prepare for use*
 
 - Clone the repository from github to local storage somewhere.
-- cd to the ```mercury``` folder.
-- ```make build``` # C/home/elkins/BASIS/mercury/README.mdile and link edit all programs.
+- Position (cd) into the ```mercury``` folder.
+- ```make build``` # Compile and link edit all programs.
 
 *Try the Sample files*
-- ```make gen-in``` # Copies the sample files to the ```mercury``` input files.
+- ```make gen-in``` # Copy the sample files to the ```mercury6``` input files.
 - ```mercury6```
 
-*Output from the Sample Files*
+*Output based on the Sample Files*
 ```
    Integrating massive bodies and particles up to the same epoch.
    Beginning the main integration.
@@ -35,27 +35,28 @@ Currently, this Gnu Fortran github project is configured for Linux and Mac OS X 
 ```
 
 *Executables Produced by Make*
-**mercury6
 
-           This is the basic integration programme. It contains all of the
-           subroutines you need to carry out integrations using any of the 
-           algorithms described by John E. Chambers and elsewhere. Output files
-           are produced in a machine-independent compressed format.  The element6 and close6 programmes
-           are required to convert mercury6 output into a readable format.
+**mercury6**
 
-**elements6
+This is the basic integration programme. It contains all of the
+subroutines you need to carry out integrations using any of the 
+algorithms described by John E. Chambers and elsewhere. Output files
+are produced in a machine-independent compressed format.  The element6 and close6 programmes
+are required to convert mercury6 output into a readable format.
 
-           This programme converts an output file created by mercury6 into
-           a set of files containing Keplerian orbital elements for each of the
-           objects of the integration. These files allow you to see how the orbit of each object
-           change with time, thus can be used as the basis for making
-           graphs or movies using a graphics/video package.
+**elements6**
 
-**close6
+This programme converts an output file created by mercury6 into
+a set of files containing Keplerian orbital elements for each of the
+objects of the integration. These files allow you to see how the orbit of each object
+change with time, thus can be used as the basis for making
+graphs or movies using a graphics/video package.
 
-           This programme converts the mercury7 output file 
-           into a set of files containing details of close encounters between
-           objects during the integration.
+**close6**
+
+This programme converts the mercury7 output file 
+into a set of files containing details of close encounters between
+objects during the integration.
 
 *Makefile Options*
 ```
