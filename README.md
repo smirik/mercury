@@ -59,7 +59,7 @@ NOTE: Some of the parameters reside in the *.in files (changes probably do not r
 **element6**
 
 This programme converts the mercury6 output file ```xv.out``` into
-another set of text-format files (*.aei) that contain Keplerian orbital elements for each of the
+a set of text-format files (*.aei) that contain Keplerian orbital elements for each of the
 objects of the integration. These files allow you to see how the orbit of each object
 change with time, thus can be used as the basis for making
 graphs or movies using a graphics/video package.
