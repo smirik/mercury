@@ -7,6 +7,7 @@ FORTRAN=gfortran
 ######                                 ^^^^^^^^^^^^
 FFLAGS=-g -O2 -Wline-truncation -Werror
 ###### End fix of issue #27
+BIN=.
 EXEC=.
 SRC=.
 FDEPENDS=$(SRC)/mercury.inc $(SRC)/swift.inc
