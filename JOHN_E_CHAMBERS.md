@@ -1,19 +1,4 @@
-**Fortran NBody integrator**
-
-_This software was initially created by John E. Chambers. It is the NBody integrator based on Bulirsh-Stoer, Everhart and other methods. It can "out of box" integrate every system like Solar System, 3 body problem and so on. The configuration is really simple. Current package is preconfigured for Linux and Mac OS X users with compile and clean tasks. Also i have added the adapted written in ruby for my purposes but it is really simple to modify it_
-
-*How to use*
-
-To compile on Linux or Mac OS X just run compile.sh. You need to have gfortran compiler. 
-If you don't have you need to install it. For other compilers change the corresponding lines
-in compile.sh
-
-To clean the directory run clean.sh
-
-Sample datas are stores in *.in.sample files. If you want to try the integrator just run the compile.sh
-and answer "yes" for the question about creating sample files.
-
-**Original message by John E. Chambers**
+**Original Manual by John E. Chambers**
 
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
