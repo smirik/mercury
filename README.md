@@ -19,7 +19,7 @@ See ```JOHN_E_CHAMBERS.md```
 - ```make gen-in``` # Copy the sample files to the ```mercury6``` input files.
 - ```mercury6``` # Execute the N-Body integrator.
 
-### Mercury6 Output based on the Sample Files
+### Mercury6 Standard Output (displayed) based on the Sample Files
 ```
    Integrating massive bodies and particles up to the same epoch.
    Beginning the main integration.
@@ -44,28 +44,34 @@ See ```JOHN_E_CHAMBERS.md```
 **mercury6**
 
 This is the basic integration programme. It contains all of the
-subroutines you need to carry out integrations using any of the 
-algorithms described by John E. Chambers and elsewhere. Output files
-are produced in a machine-independent compressed format.  The element6 and close6 programmes
-are required to convert mercury6 output into a readable format.
+code to carry out integrations using any of the 
+algorithms described by John E. Chambers and elsewhere. 
+
+Text-format output files (*.dmp, *.tmp) 
+are not used by the subsequent ```element6``` and ```close6``` programmes.  They seem to be historical intermediate files.  Note that file X.tmp = file X.dmp.  They could use more explanation!
+
+Binary output files ```ce.out``` (used by ```close6```) and ```xv.out``` (used by ```element6```) are produced in a machine-independent compressed format.  They could use more explanation!
+
+Text-format output file ```info.out``` contains a summary of the input parameters.  
+
+NOTE: Some of the parameters reside in the *.in files (changes probably do not requiring recompilation) and some of the parameters are specified in the Fortran include files - ```mercury.inc``` and ```swift.inc``` (changes require recompilation).
 
 **element6**
 
-This programme converts the mercury6 output file into
-a set of binary files (*.out) containing Keplerian orbital elements for each of the
+This programme converts the mercury6 output file ```xv.out``` into
+another set of text-format files (*.aei) that contain Keplerian orbital elements for each of the
 objects of the integration. These files allow you to see how the orbit of each object
 change with time, thus can be used as the basis for making
-graphs or movies using a graphics/video package.  Sorry, but 
+graphs or movies using a graphics/video package.
 
-The sample input files will yield text-format ```element6``` output files (*.aei) for Earth, Apollo, and Apophis.
+The resultant text-format ```element.out``` file contains a summary of body features.
 
-The resultant ```element.out``` file for the sample input files contains a text-format summary of features for 
-the Solar System planets, Apollo, and Apophis.
+The sample input files will yield ```element6``` output files for the Solar System planets, Apollo, and Apophis.
 
 **close6**
 
-This programme converts the mercury6 output file 
-into a set of files (*.clo) containing text-format details of close encounters between
+This programme converts the mercury6 output file ```ce.out``` 
+into a set of text-format files (*.clo) containing details of close encounters between
 objects during the integration.
 
 The sample input files will yield ```close6``` output for the Solar System planets, Apollo, and Apophis.
