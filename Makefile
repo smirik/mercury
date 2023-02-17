@@ -2,8 +2,11 @@
 #
 # --- constants
 FORTRAN=gfortran
-FFLAGS=-g -O2 -Wline-truncation -Wsurprising -Werror
-BIN=.
+###### Begin fix of issue #27
+###### FFLAGS=-g -O2 -Wline-truncation -Wsurprising -Werror
+######                                 ^^^^^^^^^^^^
+FFLAGS=-g -O2 -Wline-truncation -Werror
+###### End fix of issue #27
 EXEC=.
 SRC=.
 FDEPENDS=$(SRC)/mercury.inc $(SRC)/swift.inc
