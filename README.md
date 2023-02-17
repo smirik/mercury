@@ -1,24 +1,25 @@
-*Overview of the NBody integrator*
+The John E Chambers N-Body integrator
+-------------------------------------
 
-This software was initially created by John E. Chambers. It is the NBody integrator based on Bulirsh-Stoer, Everhart and other methods. As-is, it can integrate any star system like our Solar System. 
+This software was initially created by John E. Chambers. It is the N-Body integrator based on Bulirsh-Stoer, Everhart and other methods. As-is, it can integrate any star system like our Solar System. 
 
 Currently, this Gnu Fortran github project is configured for Linux and Mac OS X users.  It is certainly adaptable for Windows and other O/S environments.
 
-*Manual Authored by John E. Chambers*
+### Manual Authored by John E. Chambers
 
-See ```JOHN_E_CHAMBERS.md```.
+See ```JOHN_E_CHAMBERS.md```
 
-*How to Prepare for use*
+### How to Prepare for use
 
 - Clone the repository from github to local storage somewhere.
 - Position (cd) into the ```mercury``` folder.
 - ```make build``` # Compile and link edit all programs.
 
-*Try the Sample files*
+### Try the Sample files
 - ```make gen-in``` # Copy the sample files to the ```mercury6``` input files.
-- ```mercury6```
+- ```mercury6``` # Execute the N-Body integrator.
 
-*Output based on the Sample Files*
+### Mercury6 Output based on the Sample Files
 ```
    Integrating massive bodies and particles up to the same epoch.
    Beginning the main integration.
@@ -38,7 +39,7 @@ See ```JOHN_E_CHAMBERS.md```.
    Integration complete.
 ```
 
-*Executables Produced by Make*
+### Executables Produced by Make
 
 **mercury6**
 
@@ -62,7 +63,7 @@ This programme converts the mercury6 output file
 into a set of files containing details of close encounters between
 objects during the integration.
 
-*Makefile Options*
+### Makefile Options
 ```
 - make build   : Build the Fortran programs
 - make unbuild : Remove all Fortran program executables
