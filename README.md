@@ -103,3 +103,7 @@ subroutines have names that begin with either `drift' or `orbel'.
 
 CAUTION: Make sure that you understand the implications of changing any of the parameter values.
 
+### Input Data from other Programmes
+
+Please note that if you use other programs to create input data files
+you must maintain data items in gfortran double precision format (e.g. use "d" exponent)
