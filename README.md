@@ -49,7 +49,7 @@ algorithms described by John E. Chambers and elsewhere. Output files
 are produced in a machine-independent compressed format.  The element6 and close6 programmes
 are required to convert mercury6 output into a readable format.
 
-**elements6**
+**element6**
 
 This programme converts the mercury6 output file into
 a set of files containing Keplerian orbital elements for each of the
