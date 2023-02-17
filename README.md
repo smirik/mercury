@@ -52,16 +52,23 @@ are required to convert mercury6 output into a readable format.
 **element6**
 
 This programme converts the mercury6 output file into
-a set of files containing Keplerian orbital elements for each of the
+a set of files (*.out) containing Keplerian orbital elements for each of the
 objects of the integration. These files allow you to see how the orbit of each object
 change with time, thus can be used as the basis for making
-graphs or movies using a graphics/video package.
+graphs or movies using a graphics/video package.  
+
+The sample input files will yield ```element6``` output files (*.aei) for Earth, Apollo, and Apophis.
+
+The resultant ```element.out``` file for the sample input files contains a summary of features for 
+the Solar System planets, Apollo, and Apophis.
 
 **close6**
 
 This programme converts the mercury6 output file 
-into a set of files containing details of close encounters between
+into a set of files (*.clo) containing details of close encounters between
 objects during the integration.
+
+The sample input files will yield ```close6``` output for the Solar System planets, Apollo, and Apophis.
 
 ### Makefile Options
 ```
